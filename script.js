@@ -3,15 +3,49 @@
 // ===================================
 
 let score =
-  Number(localStorage.getItem("score")) || 0;
+  Number(
+    localStorage.getItem("score")
+  ) || 0;
 
 
-let hp =
-  Number(localStorage.getItem("hp"));
+
+// ===================================
+// HP
+// ===================================
+
+// 初めて開いた端末では
+// localStorage.getItem("hp") は null。
+//
+// Number(null) は 0 になってしまうので、
+// null を先に判定する。
+
+const savedHp =
+  localStorage.getItem("hp");
 
 
-if (!Number.isFinite(hp)) {
+let hp;
+
+
+if (savedHp === null) {
+
   hp = 100;
+
+}
+
+else {
+
+  hp =
+    Number(savedHp);
+
+
+  if (
+    !Number.isFinite(hp)
+  ) {
+
+    hp = 100;
+
+  }
+
 }
 
 
@@ -31,12 +65,58 @@ let weekOffset = 0;
 
 
 // ===================================
+// HP 0 BUG ONE-TIME FIX
+// ===================================
+
+// 以前のコードによって
+// 新規ユーザーのHPが0になった場合だけ修復する。
+//
+// すでにクエストやXPがあるプレイデータの
+// 本物のHP 0は勝手に回復させない。
+
+const hpFixKey =
+  "hpInitializationFixV1";
+
+
+if (
+  localStorage.getItem(hpFixKey) === null
+) {
+
+  if (
+    savedHp === "0" &&
+    score === 0 &&
+    quests.length === 0
+  ) {
+
+    hp = 100;
+
+
+    localStorage.setItem(
+      "hp",
+      "100"
+    );
+
+  }
+
+
+  localStorage.setItem(
+    hpFixKey,
+    "done"
+  );
+
+}
+
+
+
+// ===================================
 // CLEAR STREAK
 // ===================================
 
 let clearStreak =
   Number(
-    localStorage.getItem("clearStreak")
+    localStorage.getItem(
+      "clearStreak"
+    )
   ) || 0;
 
 
@@ -53,18 +133,23 @@ const savedStreakDate =
 
 const operators = [
 
-  // =================================
-  // OPERATOR 01
-  // =================================
-
   {
     name: "OPERATOR 01",
 
     images: {
-      normal: "images/op1-normal.png",
-      happy: "images/op1-happy.png",
-      serious: "images/op1-serious.png",
-      casual: "images/op1-casual.png"
+
+      normal:
+        "images/op1-normal.png",
+
+      happy:
+        "images/op1-happy.png",
+
+      serious:
+        "images/op1-serious.png",
+
+      casual:
+        "images/op1-casual.png"
+
     },
 
     messages: {
@@ -148,19 +233,23 @@ const operators = [
   },
 
 
-
-  // =================================
-  // OPERATOR 02
-  // =================================
-
   {
     name: "OPERATOR 02",
 
     images: {
-      normal: "images/op2-normal.png",
-      happy: "images/op2-happy.png",
-      serious: "images/op2-serious.png",
-      casual: "images/op2-casual.png"
+
+      normal:
+        "images/op2-normal.png",
+
+      happy:
+        "images/op2-happy.png",
+
+      serious:
+        "images/op2-serious.png",
+
+      casual:
+        "images/op2-casual.png"
+
     },
 
     messages: {
@@ -244,19 +333,23 @@ const operators = [
   },
 
 
-
-  // =================================
-  // OPERATOR 03
-  // =================================
-
   {
     name: "OPERATOR 03",
 
     images: {
-      normal: "images/op3-normal.png",
-      happy: "images/op3-happy.png",
-      serious: "images/op3-serious.png",
-      casual: "images/op3-casual.png"
+
+      normal:
+        "images/op3-normal.png",
+
+      happy:
+        "images/op3-happy.png",
+
+      serious:
+        "images/op3-serious.png",
+
+      casual:
+        "images/op3-casual.png"
+
     },
 
     messages: {
@@ -340,19 +433,23 @@ const operators = [
   },
 
 
-
-  // =================================
-  // OPERATOR 04
-  // =================================
-
   {
     name: "OPERATOR 04",
 
     images: {
-      normal: "images/op4-normal.png",
-      happy: "images/op4-happy.png",
-      serious: "images/op4-serious.png",
-      casual: "images/op4-casual.png"
+
+      normal:
+        "images/op4-normal.png",
+
+      happy:
+        "images/op4-happy.png",
+
+      serious:
+        "images/op4-serious.png",
+
+      casual:
+        "images/op4-casual.png"
+
     },
 
     messages: {
@@ -436,19 +533,23 @@ const operators = [
   },
 
 
-
-  // =================================
-  // OPERATOR 05
-  // =================================
-
   {
     name: "OPERATOR 05",
 
     images: {
-      normal: "images/op5-normal.png",
-      happy: "images/op5-happy.png",
-      serious: "images/op5-serious.png",
-      casual: "images/op5-casual.png"
+
+      normal:
+        "images/op5-normal.png",
+
+      happy:
+        "images/op5-happy.png",
+
+      serious:
+        "images/op5-serious.png",
+
+      casual:
+        "images/op5-casual.png"
+
     },
 
     messages: {
@@ -532,19 +633,23 @@ const operators = [
   },
 
 
-
-  // =================================
-  // OPERATOR 06
-  // =================================
-
   {
     name: "OPERATOR 06",
 
     images: {
-      normal: "images/op6-normal.png",
-      happy: "images/op6-happy.png",
-      serious: "images/op6-serious.png",
-      casual: "images/op6-casual.png"
+
+      normal:
+        "images/op6-normal.png",
+
+      happy:
+        "images/op6-happy.png",
+
+      serious:
+        "images/op6-serious.png",
+
+      casual:
+        "images/op6-casual.png"
+
     },
 
     messages: {
@@ -791,11 +896,25 @@ function displayDate(
 
 
 // ===================================
-// OLD QUEST SUPPORT
+// SAVE QUESTS
 // ===================================
 
-let migrated =
-  false;
+function saveQuests() {
+
+  localStorage.setItem(
+    "quests",
+    JSON.stringify(quests)
+  );
+
+}
+
+
+
+// ===================================
+// OLD DATA SUPPORT
+// ===================================
+
+let migrated = false;
 
 
 quests.forEach(
@@ -806,8 +925,7 @@ quests.forEach(
       quest.date =
         getToday();
 
-      migrated =
-        true;
+      migrated = true;
 
     }
 
@@ -824,16 +942,14 @@ if (migrated) {
 
 
 // ===================================
-// CLEAR STREAK DATE CHECK
+// STREAK DATE
 // ===================================
 
 if (
-  savedStreakDate !==
-  getToday()
+  savedStreakDate !== getToday()
 ) {
 
-  clearStreak =
-    0;
+  clearStreak = 0;
 
   localStorage.setItem(
     "clearStreak",
@@ -909,19 +1025,13 @@ function getShiftText() {
   const hour =
     new Date().getHours();
 
-  if (
-    hour < 12
-  ) {
+  if (hour < 12) {
 
-    return (
-      "12:00 AM — 11:59 AM"
-    );
+    return "12:00 AM — 11:59 AM";
 
   }
 
-  return (
-    "12:00 PM — 11:59 PM"
-  );
+  return "12:00 PM — 11:59 PM";
 
 }
 
@@ -964,7 +1074,7 @@ function getTimePeriod() {
 
 
 // ===================================
-// RANDOM MESSAGE
+// RANDOM
 // ===================================
 
 function randomMessage(array) {
@@ -981,7 +1091,7 @@ function randomMessage(array) {
 
 
 // ===================================
-// TODAY PROGRESS
+// PROGRESS
 // ===================================
 
 function getTodayProgress() {
@@ -994,10 +1104,7 @@ function getTodayProgress() {
     quests.filter(
       function (quest) {
 
-        return (
-          quest.date ===
-          today
-        );
+        return quest.date === today;
 
       }
     );
@@ -1013,24 +1120,8 @@ function getTodayProgress() {
     ).length;
 
 
-  const failed =
-    todays.filter(
-      function (quest) {
-
-        return quest.failed;
-
-      }
-    ).length;
-
-
   const total =
     todays.length;
-
-
-  const rate =
-    total === 0
-      ? 0
-      : completed / total;
 
 
   return {
@@ -1041,11 +1132,10 @@ function getTodayProgress() {
     completed:
       completed,
 
-    failed:
-      failed,
-
     rate:
-      rate
+      total === 0
+        ? 0
+        : completed / total
 
   };
 
@@ -1054,7 +1144,7 @@ function getTodayProgress() {
 
 
 // ===================================
-// OPERATOR DISPLAY
+// OPERATOR
 // ===================================
 
 let operatorReturnTimer =
@@ -1079,8 +1169,7 @@ function showOperator(
 
   const nextIndex =
     (
-      getOperatorIndex() +
-      1
+      getOperatorIndex() + 1
     ) %
     operators.length;
 
@@ -1090,9 +1179,6 @@ function showOperator(
     operators[nextIndex].name;
 
 
-
-  // LEVEL UP
-  // HPが低くてもレベルアップ演出は優先
 
   if (
     state === "levelUp"
@@ -1112,8 +1198,6 @@ function showOperator(
 
 
 
-  // HP LOW
-
   if (
     hp <= 30
   ) {
@@ -1131,8 +1215,6 @@ function showOperator(
   }
 
 
-
-  // DAILY GREETING
 
   if (
     state === "daily"
@@ -1152,8 +1234,6 @@ function showOperator(
 
 
 
-  // QUEST ADDED
-
   if (
     state === "add"
   ) {
@@ -1171,8 +1251,6 @@ function showOperator(
   }
 
 
-
-  // SUCCESS
 
   if (
     state === "success"
@@ -1192,8 +1270,6 @@ function showOperator(
 
 
 
-  // STREAK
-
   if (
     state === "streak"
   ) {
@@ -1211,8 +1287,6 @@ function showOperator(
   }
 
 
-
-  // FAIL
 
   if (
     state === "fail"
@@ -1232,8 +1306,6 @@ function showOperator(
 
 
 
-  // COMPLETE
-
   if (
     state === "complete"
   ) {
@@ -1252,8 +1324,6 @@ function showOperator(
 
 
 
-  // CLICK / TALK
-
   if (
     state === "talk"
   ) {
@@ -1271,10 +1341,6 @@ function showOperator(
   }
 
 
-
-  // ===================================
-  // NORMAL IDLE STATE
-  // ===================================
 
   const progress =
     getTodayProgress();
@@ -1382,7 +1448,7 @@ function showOperator(
 
 
 // ===================================
-// TEMPORARY OPERATOR REACTION
+// TEMP OPERATOR STATE
 // ===================================
 
 function temporaryOperatorState(
@@ -1390,9 +1456,7 @@ function temporaryOperatorState(
   duration = 8000
 ) {
 
-  showOperator(
-    state
-  );
+  showOperator(state);
 
 
   clearTimeout(
@@ -1404,9 +1468,7 @@ function temporaryOperatorState(
     setTimeout(
       function () {
 
-        showOperator(
-          "idle"
-        );
+        showOperator("idle");
 
       },
       duration
@@ -1438,7 +1500,6 @@ function playLevelUpEffect() {
   );
 
 
-  // アニメーションを再スタートさせる
   void playerPanel.offsetWidth;
 
 
@@ -1458,7 +1519,6 @@ function playLevelUpEffect() {
       playerPanel.classList.remove(
         "level-up-effect"
       );
-
 
       xpBar.classList.remove(
         "level-up-effect"
@@ -1516,8 +1576,7 @@ function updatePlayer() {
 
   xpBar.style.width =
     (
-      score %
-      100
+      score % 100
     ) +
     "%";
 
@@ -1543,24 +1602,7 @@ function updatePlayer() {
 
 
 // ===================================
-// SAVE QUESTS
-// ===================================
-
-function saveQuests() {
-
-  localStorage.setItem(
-    "quests",
-    JSON.stringify(
-      quests
-    )
-  );
-
-}
-
-
-
-// ===================================
-// ALL COMPLETE CHECK
+// ALL COMPLETE
 // ===================================
 
 function areTodayQuestsComplete() {
@@ -1573,10 +1615,7 @@ function areTodayQuestsComplete() {
     quests.filter(
       function (quest) {
 
-        return (
-          quest.date ===
-          today
-        );
+        return quest.date === today;
 
       }
     );
@@ -1604,7 +1643,7 @@ function areTodayQuestsComplete() {
 
 
 // ===================================
-// TODAY QUESTS
+// TODAY QUEST
 // ===================================
 
 function showTodayQuests() {
@@ -1621,10 +1660,7 @@ function showTodayQuests() {
     quests.filter(
       function (quest) {
 
-        return (
-          quest.date ===
-          today
-        );
+        return quest.date === today;
 
       }
     );
@@ -1724,6 +1760,7 @@ function showTodayQuests() {
       );
 
 
+
       const clearButton =
         document.createElement(
           "button"
@@ -1738,6 +1775,7 @@ function showTodayQuests() {
         "clear-button";
 
 
+
       const failButton =
         document.createElement(
           "button"
@@ -1750,6 +1788,7 @@ function showTodayQuests() {
 
       failButton.className =
         "fail-button";
+
 
 
       const deleteButton =
@@ -1801,9 +1840,7 @@ function showTodayQuests() {
 
 
 
-      // =================================
       // CLEAR
-      // =================================
 
       clearButton.addEventListener(
         "click",
@@ -1819,7 +1856,6 @@ function showTodayQuests() {
           }
 
 
-          // 達成前のLEVEL
           const oldLevel =
             Math.floor(
               score / 100
@@ -1830,7 +1866,6 @@ function showTodayQuests() {
             quest.xp;
 
 
-          // 達成後のLEVEL
           const newLevel =
             Math.floor(
               score / 100
@@ -1851,9 +1886,7 @@ function showTodayQuests() {
 
           localStorage.setItem(
             "clearStreak",
-            String(
-              clearStreak
-            )
+            String(clearStreak)
           );
 
 
@@ -1872,9 +1905,6 @@ function showTodayQuests() {
           showWeekPlan();
 
 
-
-          // LEVEL UPが最優先
-
           if (
             didLevelUp
           ) {
@@ -1889,9 +1919,6 @@ function showTodayQuests() {
 
           }
 
-
-          // 全クエスト達成
-
           else if (
             areTodayQuestsComplete()
           ) {
@@ -1902,9 +1929,6 @@ function showTodayQuests() {
 
           }
 
-
-          // 2連続以上
-
           else if (
             clearStreak >= 2
           ) {
@@ -1914,9 +1938,6 @@ function showTodayQuests() {
             );
 
           }
-
-
-          // 普通の達成
 
           else {
 
@@ -1931,9 +1952,7 @@ function showTodayQuests() {
 
 
 
-      // =================================
       // FAIL
-      // =================================
 
       failButton.addEventListener(
         "click",
@@ -1949,16 +1968,14 @@ function showTodayQuests() {
           }
 
 
-          hp -=
-            10;
+          hp -= 10;
 
 
           if (
             hp < 0
           ) {
 
-            hp =
-              0;
+            hp = 0;
 
           }
 
@@ -1967,8 +1984,7 @@ function showTodayQuests() {
             true;
 
 
-          clearStreak =
-            0;
+          clearStreak = 0;
 
 
           localStorage.setItem(
@@ -1995,9 +2011,7 @@ function showTodayQuests() {
 
 
 
-      // =================================
       // DELETE
-      // =================================
 
       deleteButton.addEventListener(
         "click",
@@ -2011,9 +2025,7 @@ function showTodayQuests() {
             );
 
 
-          if (
-            !answer
-          ) {
+          if (!answer) {
 
             return;
 
@@ -2032,9 +2044,7 @@ function showTodayQuests() {
 
           showWeekPlan();
 
-          showOperator(
-            "idle"
-          );
+          showOperator("idle");
 
         }
       );
@@ -2072,9 +2082,7 @@ function showTodayQuests() {
 // MONDAY
 // ===================================
 
-function getMonday(
-  date
-) {
+function getMonday(date) {
 
   const newDate =
     new Date(
@@ -2188,9 +2196,7 @@ function showWeekPlan() {
 
 
     const dateString =
-      formatDate(
-        date
-      );
+      formatDate(date);
 
 
     const dayColumn =
@@ -2204,8 +2210,7 @@ function showWeekPlan() {
 
 
     if (
-      dateString ===
-      getToday()
+      dateString === getToday()
     ) {
 
       dayColumn.classList.add(
@@ -2251,8 +2256,7 @@ function showWeekPlan() {
 
     dateNumber.textContent =
       (
-        date.getMonth() +
-        1
+        date.getMonth() + 1
       ) +
       "/" +
       date.getDate();
@@ -2269,8 +2273,7 @@ function showWeekPlan() {
 
 
     if (
-      dateString ===
-      getToday()
+      dateString === getToday()
     ) {
 
       const todayLabel =
@@ -2410,9 +2413,7 @@ function showWeekPlan() {
               );
 
 
-            if (
-              !answer
-            ) {
+            if (!answer) {
 
               return;
 
@@ -2443,9 +2444,7 @@ function showWeekPlan() {
 
             showWeekPlan();
 
-            showOperator(
-              "idle"
-            );
+            showOperator("idle");
 
           }
         );
@@ -2579,9 +2578,7 @@ addQuestButton.addEventListener(
 
     if (
       questName === "" ||
-      !Number.isFinite(
-        questXp
-      ) ||
+      !Number.isFinite(questXp) ||
       questXp <= 0 ||
       questDate === ""
     ) {
@@ -2655,17 +2652,14 @@ resetLevelButton.addEventListener(
       );
 
 
-    if (
-      !answer
-    ) {
+    if (!answer) {
 
       return;
 
     }
 
 
-    score =
-      0;
+    score = 0;
 
 
     updatePlayer();
@@ -2700,8 +2694,7 @@ currentWeekButton.addEventListener(
   "click",
   function () {
 
-    weekOffset =
-      0;
+    weekOffset = 0;
 
     showWeekPlan();
 
@@ -2782,7 +2775,7 @@ else {
 
 
 // ===================================
-// OPERATOR / DATE CHECK
+// DATE / OPERATOR WATCH
 // ===================================
 
 let lastOperatorIndex =
@@ -2804,9 +2797,6 @@ setInterval(
       getToday();
 
 
-
-    // OPERATOR CHANGED
-
     if (
       newOperatorIndex !==
       lastOperatorIndex
@@ -2823,9 +2813,6 @@ setInterval(
     }
 
 
-
-    // DATE CHANGED
-
     if (
       newDate !==
       lastKnownDate
@@ -2835,8 +2822,7 @@ setInterval(
         newDate;
 
 
-      clearStreak =
-        0;
+      clearStreak = 0;
 
 
       localStorage.setItem(
