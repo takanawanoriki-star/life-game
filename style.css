@@ -1559,3 +1559,267 @@ button:disabled {
   }
 
 }
+/* =========================================
+   PROGRESSION / STREAK / REWARDS
+========================================= */
+
+body[data-theme="violet"] {
+  --trion: #a970ff;
+  --trion-soft: #d2b4ff;
+  --border-light: #7c5caf;
+}
+
+body[data-theme="crimson"] {
+  --trion: #ff5577;
+  --trion-soft: #ff9caf;
+  --border-light: #a84a61;
+}
+
+body[data-theme="gold"] {
+  --trion: #ffc94d;
+  --trion-soft: #ffe49a;
+  --border-light: #9b7b34;
+}
+
+body[data-theme="emerald"] {
+  --trion: #3ee6a2;
+  --trion-soft: #a2f7d5;
+  --border-light: #3b8e70;
+}
+
+body[data-theme="ice"] {
+  --trion: #a8f4ff;
+  --trion-soft: #e1fbff;
+  --border-light: #70aeba;
+}
+
+.progression-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.progress-card {
+  min-height: 108px;
+  padding: 16px 17px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #20465d;
+  border-top: 2px solid var(--trion);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-card::after {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -28px;
+  width: 74px;
+  height: 74px;
+  border: 1px solid rgba(120, 234, 255, 0.12);
+  transform: rotate(45deg);
+}
+
+.progress-label {
+  display: block;
+  color: var(--text-sub);
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.progress-card strong {
+  display: block;
+  margin-top: 9px;
+  color: #fff;
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.progress-card small {
+  display: block;
+  margin-top: 8px;
+  color: #6f93a6;
+  font-size: 9px;
+  letter-spacing: 0.7px;
+}
+
+.streak-card strong {
+  color: var(--trion-soft);
+}
+
+.reward-panel,
+.unlock-panel {
+  margin-top: 22px;
+  padding: 18px;
+  background: linear-gradient(135deg, rgba(9, 29, 43, 0.92), rgba(4, 14, 23, 0.94));
+  border: 1px solid #28536c;
+  border-left: 3px solid var(--trion);
+}
+
+.reward-panel-head,
+.unlock-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.reward-panel h3 {
+  margin: 6px 0 0;
+  color: #fff;
+  font-size: 21px;
+  letter-spacing: 2px;
+}
+
+.reward-xp {
+  color: var(--trion-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.reward-name {
+  margin: 17px 0 4px;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.reward-description,
+.saved-reward-text {
+  margin: 4px 0 0;
+  color: var(--text-sub);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.my-reward-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.theme-label {
+  margin-left: auto;
+  color: var(--text-sub);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+}
+
+#themeSelect {
+  min-width: 145px;
+  padding: 8px 10px;
+  color: var(--text-main);
+  background: #07121c;
+  border: 1px solid #25485d;
+}
+
+.reward-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.reward-badge {
+  padding: 8px 10px;
+  color: #6f8998;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid #2b4556;
+  font-size: 9px;
+  letter-spacing: 0.8px;
+}
+
+.reward-badge.unlocked {
+  color: var(--trion-soft);
+  border-color: var(--trion);
+  box-shadow: 0 0 9px rgba(0, 217, 255, 0.12);
+}
+
+/* =========================================
+   CELEBRATION EFFECTS
+========================================= */
+
+.player.streak-celebration {
+  animation: streakPanelFlash 1.8s ease;
+}
+
+.operator-mini.operator-celebration .operator-ring {
+  animation: operatorCelebrationRing 1.2s ease 2;
+}
+
+@keyframes streakPanelFlash {
+  0% { box-shadow: 0 0 0 rgba(0, 217, 255, 0); }
+  30% { box-shadow: 0 0 42px rgba(0, 217, 255, 0.62), inset 0 0 22px rgba(0, 217, 255, 0.12); }
+  100% { box-shadow: 0 0 0 rgba(0, 217, 255, 0); }
+}
+
+@keyframes operatorCelebrationRing {
+  0% { transform: scale(1); opacity: 0.45; }
+  50% { transform: scale(1.12); opacity: 1; box-shadow: 0 0 38px var(--trion); }
+  100% { transform: scale(1); opacity: 0.45; }
+}
+
+.achievement-toast {
+  position: fixed;
+  left: 50%;
+  top: 22px;
+  z-index: 3000;
+  width: min(440px, calc(100vw - 28px));
+  padding: 15px 18px;
+  transform: translate(-50%, -150%);
+  opacity: 0;
+  background: rgba(4, 16, 25, 0.97);
+  border: 1px solid var(--trion);
+  border-left: 4px solid var(--trion);
+  box-shadow: 0 0 28px rgba(0, 217, 255, 0.2);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+  pointer-events: none;
+}
+
+.achievement-toast.show {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
+.achievement-toast span {
+  color: var(--trion-soft);
+  font-size: 8px;
+  letter-spacing: 2px;
+}
+
+.achievement-toast strong {
+  display: block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: 18px;
+  letter-spacing: 1px;
+}
+
+.achievement-toast p {
+  margin: 5px 0 0;
+  color: var(--text-sub);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 750px) {
+  .progression-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-reward-row {
+    grid-template-columns: 1fr;
+  }
+
+  .unlock-head {
+    align-items: center;
+  }
+
+  .theme-label {
+    margin-left: 0;
+  }
+}

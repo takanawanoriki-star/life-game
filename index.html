@@ -1,255 +1,141 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Life Game</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+  <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
-
   <h1>Life Game</h1>
 
-
-  <!-- =========================
-       MINI OPERATOR
-  ========================== -->
-
+  <!-- MINI OPERATOR -->
   <div class="operator-mini">
-
     <div class="operator-bubble">
-
-      <p id="operatorMessage">
-        システム起動中...
-      </p>
-
+      <p id="operatorMessage">システム起動中...</p>
     </div>
-
 
     <div class="operator-character">
-
       <div class="operator-ring"></div>
-
-      <img
-        id="operatorImage"
-        src=""
-        alt="Current Operator"
-        title="クリックすると話します"
-      >
-
+      <img id="operatorImage" src="" alt="Current Operator" title="クリックすると話します">
 
       <div class="operator-meta">
-
-        <span class="operator-status">
-          ● ONLINE
-        </span>
-
-        <strong id="operatorName">
-          OPERATOR 01
-        </strong>
-
+        <span class="operator-status">● ONLINE</span>
+        <strong id="operatorName">OPERATOR 01</strong>
         <span id="operatorShift"></span>
-
         <span id="nextOperator"></span>
-
       </div>
-
     </div>
-
   </div>
 
-
-
-  <!-- =========================
-       PLAYER
-  ========================== -->
-
+  <!-- PLAYER -->
   <section class="player">
-
     <h2>PLAYER</h2>
 
-
     <div class="player-info">
-
-      <p>
-        LEVEL
-        <span id="level">1</span>
-      </p>
-
-      <p>
-        TOTAL XP
-        <span id="score">0</span>
-      </p>
-
-      <p>
-        HP
-        <span id="hp">100</span> / 100
-      </p>
-
+      <p>LEVEL <span id="level">1</span></p>
+      <p>TOTAL XP <span id="score">0</span></p>
+      <p>HP <span><span id="hp">100</span> / 100</span></p>
     </div>
 
-
-    <p class="bar-title">
-      NEXT LEVEL
-    </p>
-
-    <div class="bar">
-
-      <div
-        id="xpBar"
-        class="xp-bar"
-      ></div>
-
-    </div>
-
-
-    <p class="bar-title">
-      HP
-    </p>
-
-    <div class="bar">
-
-      <div
-        id="hpBar"
-        class="hp-bar"
-      ></div>
-
-    </div>
-
-
-    <button
-      id="resetLevelButton"
-      class="reset-button"
-    >
-      LEVEL RESET
-    </button>
-
-  </section>
-
-
-
-  <!-- =========================
-       NEW QUEST
-  ========================== -->
-
-  <section>
-
-    <h2>NEW QUEST</h2>
-
-
-    <div class="quest-form">
-
-      <input
-        id="questName"
-        type="text"
-        placeholder="クエスト名"
-      >
-
-
-      <input
-        id="questXp"
-        type="number"
-        placeholder="XP"
-        min="1"
-      >
-
-
-      <input
-        id="questDate"
-        type="date"
-      >
-
-
-      <button id="addQuestButton">
-        クエスト追加
-      </button>
-
-    </div>
-
-  </section>
-
-
-
-  <!-- =========================
-       TODAY
-  ========================== -->
-
-  <section>
-
-    <h2>TODAY'S QUEST</h2>
-
-    <p
-      id="todayText"
-      class="date-text"
-    ></p>
-
-    <div id="todayQuestList"></div>
-
-  </section>
-
-
-
-  <!-- =========================
-       WEEKLY
-  ========================== -->
-
-  <section>
-
-    <div class="week-header">
-
-      <div>
-
-        <h2>WEEKLY PLAN</h2>
-
-        <p
-          id="weekRangeText"
-          class="date-text"
-        ></p>
-
+    <div class="progression-grid">
+      <div class="progress-card rank-card">
+        <span class="progress-label">TITLE</span>
+        <strong id="playerTitle">STARTER</strong>
+        <small id="titleSubText">MISSION START</small>
       </div>
 
+      <div class="progress-card streak-card">
+        <span class="progress-label">CURRENT STREAK</span>
+        <strong id="currentStreak">🔥 0 DAYS</strong>
+        <small>クエストがない日は休息日</small>
+      </div>
+
+      <div class="progress-card streak-card">
+        <span class="progress-label">BEST STREAK</span>
+        <strong id="bestStreak">🏆 0 DAYS</strong>
+        <small id="bestStreakSub">PERSONAL RECORD</small>
+      </div>
+    </div>
+
+    <p class="bar-title">NEXT LEVEL</p>
+    <div class="bar"><div id="xpBar" class="xp-bar"></div></div>
+
+    <p class="bar-title">HP</p>
+    <div class="bar"><div id="hpBar" class="hp-bar"></div></div>
+
+    <div class="reward-panel">
+      <div class="reward-panel-head">
+        <div>
+          <span class="progress-label">NEXT REWARD</span>
+          <h3 id="nextRewardLevel">LEVEL 5</h3>
+        </div>
+        <span id="nextRewardXp" class="reward-xp">あと 400 XP</span>
+      </div>
+
+      <p id="nextRewardName" class="reward-name">ROOKIE TITLE</p>
+      <p id="nextRewardDescription" class="reward-description">最初のランク称号を解放</p>
+
+      <div class="my-reward-row">
+        <input id="myRewardInput" type="text" maxlength="60" placeholder="このレベルで自分にあげるご褒美">
+        <button id="saveRewardButton">MY REWARD 保存</button>
+      </div>
+      <p id="savedRewardText" class="saved-reward-text">MY REWARD // 未設定</p>
+    </div>
+
+    <div class="unlock-panel">
+      <div class="unlock-head">
+        <span class="progress-label">UNLOCKS</span>
+        <label class="theme-label" for="themeSelect">UI THEME</label>
+        <select id="themeSelect"></select>
+      </div>
+      <div id="rewardBadges" class="reward-badges"></div>
+    </div>
+
+    <button id="resetLevelButton" class="reset-button">LEVEL RESET</button>
+  </section>
+
+  <!-- NEW QUEST -->
+  <section>
+    <h2>NEW QUEST</h2>
+    <div class="quest-form">
+      <input id="questName" type="text" placeholder="クエスト名">
+      <input id="questXp" type="number" placeholder="XP" min="1">
+      <input id="questDate" type="date">
+      <button id="addQuestButton">クエスト追加</button>
+    </div>
+  </section>
+
+  <!-- TODAY -->
+  <section>
+    <h2>TODAY'S QUEST</h2>
+    <p id="todayText" class="date-text"></p>
+    <div id="todayQuestList"></div>
+  </section>
+
+  <!-- WEEKLY -->
+  <section>
+    <div class="week-header">
+      <div>
+        <h2>WEEKLY PLAN</h2>
+        <p id="weekRangeText" class="date-text"></p>
+      </div>
 
       <div class="week-buttons">
-
-        <button id="prevWeekButton">
-          ← 前の週
-        </button>
-
-        <button id="currentWeekButton">
-          今週
-        </button>
-
-        <button id="nextWeekButton">
-          次の週 →
-        </button>
-
+        <button id="prevWeekButton">← 前の週</button>
+        <button id="currentWeekButton">今週</button>
+        <button id="nextWeekButton">次の週 →</button>
       </div>
-
     </div>
-
-
-    <div
-      id="weekPlan"
-      class="week-grid"
-    ></div>
-
+    <div id="weekPlan" class="week-grid"></div>
   </section>
 
+  <div id="achievementToast" class="achievement-toast" aria-live="polite">
+    <span id="achievementKicker">MISSION UPDATE</span>
+    <strong id="achievementTitle"></strong>
+    <p id="achievementText"></p>
+  </div>
 
   <script src="script.js"></script>
-
 </body>
-
 </html>
