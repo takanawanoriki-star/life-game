@@ -130,6 +130,26 @@
     <div id="weekPlan" class="week-grid"></div>
   </section>
 
+
+  <!-- FULL SCREEN EVENT -->
+  <div id="fullScreenEvent" class="full-screen-event" aria-live="polite" aria-hidden="true">
+    <div class="event-scanlines"></div>
+    <div class="event-core">
+      <span id="eventKicker" class="event-kicker">SYSTEM EVENT</span>
+      <h2 id="eventTitle" class="event-title">LEVEL UP</h2>
+      <p id="eventSubtitle" class="event-subtitle"></p>
+
+      <div id="eventOperatorWrap" class="event-operator-wrap">
+        <div class="event-ring"></div>
+        <img id="eventOperatorImage" class="event-operator-image" src="" alt="Event Operator">
+      </div>
+
+      <strong id="eventOperatorName" class="event-operator-name"></strong>
+      <p id="eventMessage" class="event-message"></p>
+      <button id="eventSkipButton" class="event-skip-button">CONTINUE</button>
+    </div>
+  </div>
+
   <div id="achievementToast" class="achievement-toast" aria-live="polite">
     <span id="achievementKicker">MISSION UPDATE</span>
     <strong id="achievementTitle"></strong>

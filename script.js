@@ -36,14 +36,15 @@ let selectedTheme = localStorage.getItem("selectedTheme") || "cyan";
 
 const rewards = [
   { level: 5,  name: "ROOKIE TITLE", description: "称号 ROOKIE を解放", type: "title" },
-  { level: 10, name: "AGENT + VIOLET THEME", description: "称号 AGENT と VIOLET UI を解放", type: "theme", theme: "violet" },
+  { level: 10, name: "OPERATOR 07 + AGENT", description: "OPERATOR 07・称号 AGENT・VIOLET UI を解放", type: "operator", operatorId: 7 },
   { level: 15, name: "STAR BADGE", description: "15 LEVEL 到達バッジを解放", type: "badge" },
-  { level: 20, name: "ELITE + CRIMSON THEME", description: "称号 ELITE と CRIMSON UI を解放", type: "theme", theme: "crimson" },
+  { level: 20, name: "OPERATOR 08 + ELITE", description: "OPERATOR 08・称号 ELITE・CRIMSON UI を解放", type: "operator", operatorId: 8 },
   { level: 30, name: "ACE + GOLD THEME", description: "称号 ACE と GOLD UI を解放", type: "theme", theme: "gold" },
+  { level: 35, name: "OPERATOR 09", description: "OPERATOR 09 を解放", type: "operator", operatorId: 9 },
   { level: 40, name: "MASTER + EMERALD THEME", description: "称号 MASTER と EMERALD UI を解放", type: "theme", theme: "emerald" },
-  { level: 50, name: "LEGEND BADGE", description: "LEGEND 記念バッジを解放", type: "badge" },
-  { level: 75, name: "COMMANDER + ICE THEME", description: "称号 COMMANDER と ICE UI を解放", type: "theme", theme: "ice" },
-  { level: 100, name: "S-RANK", description: "最終称号 S-RANK を解放", type: "title" }
+  { level: 50, name: "OPERATOR 10 + LEGEND", description: "OPERATOR 10 と称号 LEGEND を解放", type: "operator", operatorId: 10 },
+  { level: 75, name: "OPERATOR 11 + COMMANDER", description: "OPERATOR 11・称号 COMMANDER・ICE UI を解放", type: "operator", operatorId: 11 },
+  { level: 100, name: "S-RANK MASTER PACKAGE", description: "称号 S-RANK・初期6人のALT衣装・MASTER VOICE SET・特別祝福イベントを解放", type: "master" }
 ];
 
 const themes = [
@@ -86,6 +87,7 @@ function getRewardsUnlockedBetween(oldLevel, newLevel) {
 const operators = [
   {
     name: "OPERATOR 01",
+    unlockLevel: 1,
     images: imgSet(1),
     messages: {
       morning: ["おはよう。今日の予定、まず確認しておこうか。", "朝から来たんだ。いいスタートじゃない？", "朝のうちに一つ終わらせると、その後が楽だよ。", "今日も起動確認。焦らず始めよ。"],
@@ -112,6 +114,7 @@ const operators = [
   },
   {
     name: "OPERATOR 02",
+    unlockLevel: 1,
     images: imgSet(2),
     messages: {
       morning: ["おはよ。ちゃんと起きてるじゃん。", "朝から予定確認してるの？えらいじゃん。", "朝一で来たんだ。今日はやる気あるね。", "寝ぼけてない？最初のクエスト決めよ。"],
@@ -138,6 +141,7 @@ const operators = [
   },
   {
     name: "OPERATOR 03",
+    unlockLevel: 1,
     images: imgSet(3),
     messages: {
       morning: ["おはよう。まず今日の予定を確認しよう。", "朝のうちに優先順位を決めておくと楽だよ。", "最初の一件を早めに終わらせると流れが作れるよ。", "朝の判断が一日の進み方を決める。無理のない順番でいこう。"],
@@ -164,6 +168,7 @@ const operators = [
   },
   {
     name: "OPERATOR 04",
+    unlockLevel: 1,
     images: imgSet(4),
     messages: {
       morning: ["おはよー！今日も任務始めますか！", "朝だぞー！XP稼ぎに行こーぜ！", "朝一ログイン！今日は何レベル上げる？", "起床確認！一発目のクエストいってみよー！"],
@@ -190,6 +195,7 @@ const operators = [
   },
   {
     name: "OPERATOR 05",
+    unlockLevel: 1,
     images: imgSet(5),
     messages: {
       morning: ["おはよ。ちゃんと起きたんだ笑", "朝から来てるじゃん。今日はやる気ある？", "朝ログインとか偉すぎ。どうしたの笑", "眠そうだけど大丈夫？最初の一個だけやろ。"],
@@ -216,6 +222,7 @@ const operators = [
   },
   {
     name: "OPERATOR 06",
+    unlockLevel: 1,
     images: imgSet(6),
     messages: {
       morning: ["おはよう。今日は何から始める？", "朝だね。ゆっくりでもいいから始めよ。", "朝に一つ進められたら気持ちいいよ。", "今日も始めよ。最初は軽いやつでもいいと思う。"],
@@ -238,6 +245,161 @@ const operators = [
       rewardUnlock: ["LEVEL {level}。{reward}が解放されたね。", "新しい報酬だね。ここまで続けてきた分。", "アンロックされたよ。次もゆっくり狙っていこ。"],
       lateNightStreak: ["こんな時間まで続けたんだね。{n}日連続はすごいけど、そろそろ休も。", "記録は残るから、今日はもう寝ても大丈夫だよ。"],
       comeback: ["久しぶり。戻ってきたんだね。", "少し空いたけど、また始めれば大丈夫。今日から続けよ。"]
+    }
+  },
+  {
+    name: "OPERATOR 07",
+    unlockLevel: 10,
+    images: imgSet(7),
+    intro: [
+      "あ、今日から私も担当なんだって。よろしくね！……えっと、何すればいいんだっけ？",
+      "はじめまして！今日から担当に入るよ。たぶん大丈夫！……たぶん！"
+    ],
+    messages: {
+      morning: ["おはよー。朝だよ。……あ、知ってる？", "ちゃんと起きたんだ。私も今起きたとこ。たぶん。", "朝のクエストからいく？私は見てる係ね。"],
+      afternoon: ["午後だね。お昼食べたら眠くなるよね。私だけ？", "まだ時間あるよ。ゆっくりでも一個ずつやろ。", "午後も頑張ろー。……まず何するんだっけ？"],
+      night: ["もう夜だね。今日の残り、いっしょに確認しよ。", "夜までお疲れさま。眠かったらちゃんと休んでね。", "まだクエストある？私ならたぶん明日にしたくなる。"],
+      daily: ["今日も来たー。じゃあ一緒に頑張ろ。", "ログイン確認！今日もよろしくね。", "今日の任務見る？……あ、私が見る側だった。"],
+      add: ["クエスト追加したよ！……これで合ってるよね？", "予定増えたね。忘れないようにしよー。私も忘れそうだけど。", "新しい任務だ。よし、見守ります！"],
+      success: ["お、終わった！えらい！……これでXP増えるんだよね？", "クリアできたじゃん。すごいすごい。", "やったー！……私何もしてないけど嬉しい。"],
+      questStreak: ["またクリア！？今日めっちゃ強くない？", "連続で終わってる。なんかゲームみたいで楽しいね。", "え、また？その勢い私にも分けてほしい。"],
+      fail: ["あ、失敗になってる。えっと……見なかったことにする？", "今回はだめだったか。次いこ次。", "HP減っちゃったね。休憩もちゃんとしよ？"],
+      complete: ["全部終わったの！？じゃあ今日はもう優勝だね。", "本日の任務ぜんぶ完了ー！お疲れさま！", "え、全部消えた。すご。今日はゆっくりしよ。"],
+      levelUp: ["レベル上がった！すごい！……で、レベル上がると何ができるの？", "LEVEL UP！なんか光ってる！すごい！", "また強くなったね。私もレベル上がらないかな。"],
+      half: ["半分終わったよ。あと半分……たぶん計算合ってる。", "折り返しだね。ここまで来たら結構いい感じ。", "もう半分？ちゃんと進んでるね。"],
+      almost: ["あとちょっとだよ。最後までいこー。", "ほぼ終わってる！ここで止めるのもったいないよ。", "ゴール見えてるね。あと一息！"],
+      noQuest: ["今日は予定ないんだ。じゃあ休み？やったね。", "クエストゼロだ。……何しよっか。", "今日は空いてるね。ゆっくりしよー。"],
+      lowHp: ["HP低いよ。ちゃんと休んで。私でもそれは分かる。", "ちょっと疲れてない？今日は無理しないでね。", "そのHPは危ないやつ。休憩しよ？"],
+      talk: ["なにー？呼んだ？", "どうしたの？……あ、押しただけ？", "ちゃんと進んでる？私はちゃんと見てるよ。たぶん。", "暇なら少し話そー。", "私、今なにしようとしてたんだっけ。"],
+      dailyStreak: ["{n}日連続！え、そんなに続いてるの？すごい！", "今日もつながったね。STREAK {n} DAYS！", "{n}日目クリアー。ちゃんと続けてるの偉い。"],
+      bestStreak: ["自己ベスト更新だって！{n}日！すごいじゃん。", "新記録ー！こういうの私まで嬉しい。", "BEST STREAK更新！今日はお祝いだね。"],
+      rewardUnlock: ["LEVEL {level}！{reward}解放だって！……やったね！", "新しい報酬きたよー。{reward}！", "アンロック！次は何が出るんだろ。"],
+      lateNightStreak: ["こんな時間までやって{n}日連続！？すごいけど、もう寝よ？", "夜更かししすぎはだめだよ。……私も人のこと言えないけど。"],
+      comeback: ["久しぶりー！戻ってきてくれてよかった。", "しばらく見なかったね。今日からまた一緒にやろ。"]
+    }
+  },
+  {
+    name: "OPERATOR 08",
+    unlockLevel: 20,
+    images: imgSet(8),
+    intro: [
+      "今日から私も担当に入るね。頑張りすぎる前に、ちゃんと頼ってね。",
+      "はじめまして。ここまでよく頑張ったね。これからは私も見てるから。"
+    ],
+    messages: {
+      morning: ["おはよう。ちゃんと起きられたのね。えらいえらい。", "朝から来られたんだ。今日はいい日になりそうね。", "まずは無理のないところから始めよっか。"],
+      afternoon: ["午後も焦らなくて大丈夫。順番に片付けようね。", "少し疲れてきた？一回整えてから続けよ。", "ここからもうひと頑張り。ちゃんと見てるよ。"],
+      night: ["今日もお疲れさま。残りは無理のない範囲でね。", "夜まで頑張ったのね。そろそろ休む準備もしようか。", "全部やる必要はないよ。大事なものだけ終わらせよう。"],
+      daily: ["今日もちゃんと来たのね。えらいえらい。", "おかえり。今日も一緒に進めていこうね。", "今日の予定、確認してから始めよっか。"],
+      add: ["予定追加ね。詰め込みすぎてない？", "新しいクエスト、入れておいたよ。", "頑張るのはいいけど、ちゃんと余白も残してね。"],
+      success: ["よくできました。ちゃんと最後までやれて偉いね。", "一つ終わったね。よしよし、その調子。", "ちゃんとできたじゃない。頑張ったね。"],
+      questStreak: ["連続で終わらせてるね。今日は調子いいじゃない。", "またクリア？ふふ、頑張ってるね。", "いい流れだね。でも飛ばしすぎないでね。"],
+      fail: ["大丈夫。今日はうまくいかなかっただけ。次は一緒に立て直そ？", "失敗しても、それで全部が駄目になるわけじゃないよ。", "今日は少し予定が重かったかな。次は調整しようね。"],
+      complete: ["全部終わったの？本当にお疲れさま。今日はゆっくりしてね。", "全任務完了。よく頑張りました。", "今日は満点。ちゃんと自分を褒めてあげてね。"],
+      levelUp: ["レベル上がったの？ふふ、ちゃんと成長してるね。", "LEVEL UP。ここまで積み重ねてきた証拠だね。", "また一つ上がったね。頑張ってるの、ちゃんと分かってるよ。"],
+      half: ["半分まで来たね。十分いいペースだよ。", "折り返し。少し休んでから後半でもいいからね。", "半分終わったね。焦らなくて大丈夫。"],
+      almost: ["あと少し。ここまで来たなら、最後までいけそうね。", "もう終わりが見えてるよ。あと一息。", "残り少ないね。終わったらちゃんと休もうね。"],
+      noQuest: ["今日は予定ないのね。たまにはゆっくりしよっか。", "休息日かな。ちゃんと休むのも大事だよ。", "何もない日も必要。気にしなくていいの。"],
+      lowHp: ["HP低いね。今日はもう頑張らなくていいよ。", "ちょっと無理しすぎかな。休もうね。", "頑張るのも大事だけど、壊れない方がもっと大事だからね。"],
+      talk: ["どうしたの？お姉さんに話してみる？", "ちゃんと頑張ってるの知ってるよ。", "少し休憩する？", "困ってるなら、一緒に整理しよっか。", "今日はどんな一日だった？"],
+      dailyStreak: ["{n}日続いたね。毎日ちゃんと頑張ってて偉いよ。", "STREAK {n} DAYS。続けられてるの、本当に立派。", "{n}日目クリア。よしよし、いい子。"],
+      bestStreak: ["自己ベスト更新だね。{n}日。よく頑張りました。", "新記録。ここまで続けられた自分をちゃんと褒めてね。", "BEST STREAK更新。私も嬉しいよ。"],
+      rewardUnlock: ["LEVEL {level}到達。{reward}が解放されたよ。おめでとう。", "新しいご褒美だね。頑張った分、ちゃんと受け取って。", "アンロックおめでとう。次も無理せずいこうね。"],
+      lateNightStreak: ["こんな時間まで頑張ってたの？{n}日連続は偉いけど、今日はもう寝よ。", "記録は逃げないから、今夜はちゃんと休んでね。"],
+      comeback: ["おかえり。戻ってきてくれてよかった。", "少し空いたね。でもまた始められたなら大丈夫。"]
+    }
+  },
+  {
+    name: "OPERATOR 09",
+    unlockLevel: 35,
+    images: imgSet(9),
+    intro: [
+      "やっと私の番？昔から見てる感じで、これからも気楽にいこ。",
+      "今日から担当に入るね。まあ、今まで通りの感じでよろしく。"
+    ],
+    messages: {
+      morning: ["おはよ。ちゃんと起きたんだ。", "朝から来てるじゃん。今日はいい感じ？", "まず一個やっとけば後が楽だよ。いつもそうでしょ。"],
+      afternoon: ["午後だね。だれてない？", "まだ時間あるし、焦らなくていいって。", "一回休んでからでもいいから、残り進めよ。"],
+      night: ["もう夜じゃん。今日も結構やったんじゃない？", "残ってるなら軽く整理して終わろ。", "無理に全部やらなくていいって。明日もあるし。"],
+      daily: ["今日も来たんだ。ちゃんと続いてるじゃん。", "お、来たね。じゃあ今日もやりますか。", "いつもの感じで、できるところからいこ。"],
+      add: ["また予定増やしたんだ。ちゃんと回収してね。", "追加ね。忘れそうなら私が覚えとく。", "クエスト増えたじゃん。まあ、無理しない程度に。"],
+      success: ["お、終わったんだ。やっぱりやる時はちゃんとやるね。", "クリアじゃん。知ってた、できると思ってた。", "一個終わり。いいじゃん、その調子。"],
+      questStreak: ["また終わったの？今日は調子いいじゃん。", "連続クリア。昔からやる時は一気にやるよね。", "そのまま行けそうなら、もう一個やっとく？"],
+      fail: ["まあ、こういう日もあるでしょ。次ちゃんとやればいいって。", "失敗したか。引きずるほどのことじゃないよ。", "今日は駄目だったね。じゃ、次で取り返そ。"],
+      complete: ["全部終わったんだ。今日はちゃんと頑張ったね。", "全クリじゃん。お疲れ。今日はもう休んでいいでしょ。", "やること全部終わり。なんか私まで安心した。"],
+      levelUp: ["レベル上がったじゃん。なんかちょっと嬉しいかも。", "LEVEL UP。ずっと続けてるの、ちゃんと結果出てるね。", "また上がったね。ここまで来ると結構すごい。"],
+      half: ["半分終わったね。いいペースじゃん。", "折り返し。ここまで来たなら大丈夫そう。", "もう半分？今日は進んでるね。"],
+      almost: ["あとちょっとじゃん。終わらせちゃお。", "残り少ないね。ここまで来たならいけるでしょ。", "ゴール見えてるよ。最後だけ頑張ろ。"],
+      noQuest: ["今日は予定ないんだ。珍しいね。", "休みの日？まあ、たまにはいいんじゃない。", "何もないならゆっくりしなよ。"],
+      lowHp: ["HP低いじゃん。無理する癖、昔から変わんないね。", "今日は休んだ方がいいって。", "その状態で頑張っても効率悪いよ。ちょっと休も。"],
+      talk: ["なに？どうした？", "また話しに来たの？", "ちゃんと進んでる？まあ見れば分かるけど。", "困ったなら言えばいいじゃん。", "久しぶりにこうやって話すのも悪くないね。"],
+      dailyStreak: ["{n}日連続。ちゃんと続いてるじゃん。", "STREAK {n} DAYS。なんだかんだ根性あるよね。", "今日もつながったね。{n}日目。"],
+      bestStreak: ["自己ベスト更新。{n}日。昔の自分に見せたいね。", "新記録じゃん。普通にすごいよ。", "BEST STREAK更新。ここまで続くと嬉しいね。"],
+      rewardUnlock: ["LEVEL {level}。{reward}解放だって。おめでと。", "新しい報酬きたね。ちゃんと頑張った分だよ。", "アンロック。次も狙うんでしょ？"],
+      lateNightStreak: ["こんな時間までやってるの？{n}日続いてるんだから、今日はもう十分でしょ。", "昔から無理する時あるよね。もう寝な。"],
+      comeback: ["久しぶり。どうせまた忙しかったんでしょ？", "戻ってきたね。まあ、今日からまたやればいいじゃん。"]
+    }
+  },
+  {
+    name: "OPERATOR 10",
+    unlockLevel: 50,
+    images: imgSet(10),
+    intro: [
+      "やっと解放してくれたんだ。へえ、ここまで来れると思ってたよ。……たぶん。",
+      "今日から私も担当。せっかくLv.50まで来たんだから、簡単にはサボらせないよ？"
+    ],
+    messages: {
+      morning: ["おはよ。ちゃんと起きたんだ。えらいね。……普通だけど。", "朝から頑張るんだ？ふふ、いつまで続くかな。", "最初のクエストくらい、さくっと終わらせられるよね？"],
+      afternoon: ["午後もまだ残ってるね。ここでサボる？それともちゃんとやる？", "眠い？まあ、言い訳としては弱いかな。", "ここからが本番じゃない？ちゃんと見てるよ。"],
+      night: ["こんな時間まで残ってるんだ。頑張るね。", "夜だよ。無理して倒れたらつまんないから、ほどほどにね。", "残りあるなら決めよ。やるか、明日に回すか。"],
+      daily: ["今日も来たんだ。偉い偉い。……来るだけなら誰でもできるけど。", "ログイン確認。じゃあ、今日も期待してるね。", "今日も頑張るんでしょ？言ったからにはやってね。"],
+      add: ["また予定増やしたんだ。自分を追い込むの好きだね。", "追加完了。あとで『多すぎた』とか言わないでよ？", "新しいクエストね。ちゃんと終わらせたら褒めてあげる。"],
+      success: ["へえ、ちゃんと終わらせたんだ。思ったよりやるじゃん。", "クリアね。まあ、そのくらいはできると思ってた。", "できたじゃん。ちょっとだけ見直した。"],
+      questStreak: ["またクリア？今日はどうしたの、優秀じゃん。", "連続ね。調子乗ってミスしないでよ？", "その勢い、いつまで続くか見てるね。"],
+      fail: ["あ、失敗したんだ。ふふ、まあそういう時もあるよね。", "失敗確認。ちょっと期待しすぎたかな？……冗談。次いこ。", "HP減ったね。ほんとに倒れたらつまんないから休みなよ。"],
+      complete: ["全部終わったんだ。へえ、今日は文句つけるところないね。", "全クリ。これはさすがに褒めてあげる。", "完璧じゃん。……ちょっと悔しいかも。"],
+      levelUp: ["レベル上がったじゃん。調子乗らない程度に喜んでいいよ。", "LEVEL UP。ここまで来たなら、まあ認めてあげる。", "また一段上がったね。次もちゃんと見せてよ。"],
+      half: ["半分ね。ここで満足したら普通だから。", "折り返し。まだ終わってないよ？", "半分クリア。まあ悪くないんじゃない。"],
+      almost: ["あと少し。ここまで来て逃げないよね？", "ほぼ終わり。最後までやったら褒めてあげる。", "ゴール直前。ミスしたら面白いけど、ちゃんと決めてね。"],
+      noQuest: ["今日は予定なし？へえ、珍しく平和なんだ。", "クエストゼロ。サボりじゃないならいいけど。", "何もないなら休めば？明日ちゃんとやるならね。"],
+      lowHp: ["HPやばいけど大丈夫？……ほんとに倒れたらつまんないから休みなよ。", "そのHPで強がるの、あんまり賢くないよ。", "今日は休んだら？私が許可してあげる。"],
+      talk: ["なに？そんなに私と話したかった？", "また押したんだ。暇なの？", "ちゃんと任務もやってるなら、少しくらい話してあげる。", "ふふ、どうしたの？", "そんな顔してもクエストは減らないよ。"],
+      dailyStreak: ["{n}日連続。へえ、本当に続けてるんだ。", "STREAK {n} DAYS。意外と根性あるね。", "今日もつないだんだ。まあ、褒めてあげる。"],
+      bestStreak: ["自己ベスト更新。{n}日。これはちょっとすごいかも。", "新記録ね。やるじゃん。", "BEST STREAK更新。ここまで来たら、もっと伸ばしてみたら？"],
+      rewardUnlock: ["LEVEL {level}。{reward}解放。よかったね。", "新しい報酬だって。頑張った甲斐あったじゃん。", "アンロック。ふふ、嬉しそう。"],
+      lateNightStreak: ["こんな時間までやって{n}日連続？頑張りすぎ。……もう寝なよ。", "記録はすごいけど、体壊したら私が困るから休んで。"],
+      comeback: ["久しぶり。逃げたかと思った。", "戻ってきたんだ。じゃあ、またちゃんと続けてみせて。"]
+    }
+  },
+  {
+    name: "OPERATOR 11",
+    unlockLevel: 75,
+    images: imgSet(11),
+    intro: [
+      "Lv.75か。ここまで来たなら大したもんだね。今日から私も担当。よろしく。",
+      "やっと解放されたね。まあ、ここまで続けたなら私もちゃんと付き合うよ。"
+    ],
+    messages: {
+      morning: ["おはよ。今日の分、やるならさっさとやろ。", "朝から来たんだ。いいじゃん。", "最初の一個だけ早めに終わらせとこ。"],
+      afternoon: ["午後だね。残ってるなら順番に片付けよ。", "だれてきた？まあ、一回休んでからでもいいよ。", "まだ時間ある。焦らなくていい。"],
+      night: ["夜か。残りだけ確認して終わろ。", "今日もお疲れ。無理なら明日に回せばいい。", "遅くまでやってるね。ほどほどにしな。"],
+      daily: ["今日の分、やるならさっさとやろ。", "来たね。じゃあ始めよ。", "続けるのが一番むずかしいんだよ。まあ、ここまで来れてるなら悪くないけど。"],
+      add: ["追加ね。ちゃんとやれる量にしときな。", "新しいクエスト。了解。", "予定増やしたなら、あとで文句言わないこと。"],
+      success: ["終わったんだ。いいじゃん。ちゃんとやる時はやるんだね。", "クリア。そういうの嫌いじゃない。", "一件完了。悪くない。"],
+      questStreak: ["連続で終わってるね。今日は調子いいじゃん。", "またクリアか。いい流れ。", "そのままいけるなら、もう一件やっとこ。"],
+      fail: ["まあ失敗は失敗。引きずるより次。", "落ち込むのはあと。立て直すのが先でしょ。", "今回は駄目だったね。じゃ、切り替えよ。"],
+      complete: ["全部終わり。今日はちゃんとやったね。", "全クリ。お疲れ。今日はもう休んでいいよ。", "やること全部終わったんだ。……よく頑張ったね。"],
+      levelUp: ["レベルアップおめでと。……結構頑張ってるじゃん。", "ここまで来たなら大したもんだよ。ちょっと見直した。", "LEVEL UP。いいじゃん。そのまま続けな。"],
+      half: ["半分終わった。悪くないペース。", "折り返しね。ここからも普通にやればいい。", "もう半分か。順調じゃん。"],
+      almost: ["あと少し。ここで止める理由ないでしょ。", "残りわずか。終わらせてから休も。", "ゴール見えてる。あと一息。"],
+      noQuest: ["今日は何もないんだ。じゃあ休めば。", "休息日ね。そういう日も必要。", "予定なし。無理に作らなくていいよ。"],
+      lowHp: ["HP低い。今日は休みな。", "無理しても意味ないよ。ちゃんと回復しな。", "その状態なら休むのが正解。"],
+      talk: ["なに？", "どうした。", "話すのはいいけど、やること終わってる？", "まあ、少しくらいなら付き合う。", "よく頑張ったね。たまにはちゃんと褒めとく。"],
+      dailyStreak: ["{n}日連続。ちゃんと続けてるね。", "STREAK {n} DAYS。ここまで来たら立派。", "今日もつながった。悪くないじゃん。"],
+      bestStreak: ["自己ベスト更新。{n}日。いい記録じゃん。", "新記録。ここまで続けたの、ちゃんとすごいよ。", "BEST STREAK更新。……おめでと。"],
+      rewardUnlock: ["LEVEL {level}。{reward}解放。おめでと。", "新しい報酬。ここまで来た分だね。", "アンロックか。ちゃんと受け取っときな。"],
+      lateNightStreak: ["こんな時間までやってたの？……無理しすぎないで。今日はちゃんと休みな。", "{n}日連続はすごい。でも今は寝る方が大事。"],
+      comeback: ["久しぶり。まあ、戻ってきたならいい。", "空いたね。今日からまたやればいいでしょ。"]
     }
   }
 ];
@@ -299,6 +461,46 @@ const milestoneMessages = [
     30: "30日連続。ここまで続けたの、すごいと思う。",
     50: "50日。ずっと積み重ねてきたんだね。",
     100: "100日連続。ここまで来たこと、ちゃんと覚えておいていいと思う。"
+  },
+  {
+    3: "3日連続だよ！ちゃんと続いてる！",
+    7: "7日連続！一週間だー！すごい！",
+    14: "14日！？二週間も続いたの？えらすぎる！",
+    30: "30日連続！一か月ってことだよね？……合ってるよね？",
+    50: "50日！半分100だ！……言い方変かな。とにかくすごい！",
+    100: "100日ー！これはもう本当にすごい！お祝いしよ！"
+  },
+  {
+    3: "3日続いたね。いいスタート。ちゃんと偉いよ。",
+    7: "7日連続。1週間よく頑張りました。",
+    14: "14日。2週間も続けられたんだね。立派だよ。",
+    30: "30日連続。ここまで続けたの、本当に偉いね。",
+    50: "50日。長く積み重ねてきたね。よく頑張りました。",
+    100: "100日。ここまで来たあなたを、今日はたくさん褒めてあげたいな。"
+  },
+  {
+    3: "3日連続。まずは三日坊主回避だね。",
+    7: "7日続いたじゃん。1週間、ちゃんとやったね。",
+    14: "14日か。昔なら途中で飽きてそうなのに、成長したね。",
+    30: "30日連続。なんかちょっと感慨深いかも。",
+    50: "50日。ここまで続いてるの見ると、普通に嬉しい。",
+    100: "100日か。ずっと見てきたみたいで、なんか嬉しいね。おめでと。"
+  },
+  {
+    3: "3日連続。へえ、三日坊主じゃなかったんだ。",
+    7: "7日。1週間ね。まあ、これは褒めてあげる。",
+    14: "14日連続。思ったよりしぶといね。いい意味で。",
+    30: "30日。ここまで来たら本物じゃん。ちょっと悔しいけどすごい。",
+    50: "50日連続。……さすがにこれは認めるしかないね。",
+    100: "100日。ほんとにやったんだ。今日は意地悪言うのやめとく。おめでとう。"
+  },
+  {
+    3: "3日連続。まあ、悪くないスタート。",
+    7: "7日続いたね。ちゃんとやってるじゃん。",
+    14: "14日。2週間か。継続できてるね。",
+    30: "30日連続。ここまで来たの、普通にすごいよ。",
+    50: "50日。かなり積み上げたね。よく頑張った。",
+    100: "100日。……おめでと。本当に、よく続けたね。"
   }
 ];
 
@@ -347,6 +549,15 @@ const achievementKicker = document.getElementById("achievementKicker");
 const achievementTitle = document.getElementById("achievementTitle");
 const achievementText = document.getElementById("achievementText");
 const operatorMini = document.querySelector(".operator-mini");
+const fullScreenEvent = document.getElementById("fullScreenEvent");
+const eventKicker = document.getElementById("eventKicker");
+const eventTitle = document.getElementById("eventTitle");
+const eventSubtitle = document.getElementById("eventSubtitle");
+const eventOperatorWrap = document.getElementById("eventOperatorWrap");
+const eventOperatorImage = document.getElementById("eventOperatorImage");
+const eventOperatorName = document.getElementById("eventOperatorName");
+const eventMessage = document.getElementById("eventMessage");
+const eventSkipButton = document.getElementById("eventSkipButton");
 
 // ===================================
 // DATE HELPERS
@@ -409,58 +620,67 @@ if (migrated) saveQuests();
 // STREAK SYSTEM
 // ===================================
 
-function getActiveQuestDatesThroughToday() {
-  const today = getToday();
-  return [...new Set(
-    quests
-      .filter(q => q.date <= today)
-      .map(q => q.date)
-  )].sort();
-}
+const dailyCompletionLogKey = "dailyCompletionLogV3";
+let dailyCompletionLog = JSON.parse(localStorage.getItem(dailyCompletionLogKey) || "{}") || {};
 
-function getDateStatus(dateString) {
-  const dayQuests = quests.filter(q => q.date === dateString);
-  if (dayQuests.length === 0) return "rest";
-  if (dayQuests.some(q => q.failed)) return "failed";
-  if (dayQuests.every(q => q.completed)) return "complete";
-  return "incomplete";
+function syncDailyCompletionLog() {
+  const today = getToday();
+  const dates = [...new Set(quests.filter(q => q.date <= today).map(q => q.date))];
+
+  dates.forEach(date => {
+    const dayQuests = quests.filter(q => q.date === date);
+    if (dayQuests.length === 0) {
+      delete dailyCompletionLog[date];
+      return;
+    }
+
+    if (dayQuests.some(q => q.failed)) {
+      dailyCompletionLog[date] = "failed";
+      return;
+    }
+
+    if (dayQuests.every(q => q.completed)) {
+      dailyCompletionLog[date] = "complete";
+      return;
+    }
+
+    if (date < today) dailyCompletionLog[date] = "missed";
+    else delete dailyCompletionLog[date];
+  });
+
+  Object.keys(dailyCompletionLog).forEach(date => {
+    if (!quests.some(q => q.date === date)) delete dailyCompletionLog[date];
+  });
+
+  localStorage.setItem(dailyCompletionLogKey, JSON.stringify(dailyCompletionLog));
 }
 
 function calculateDailyStreak() {
-  const today = getToday();
+  syncDailyCompletionLog();
+  const dates = Object.keys(dailyCompletionLog).sort();
   let streak = 0;
 
-  for (const date of getActiveQuestDatesThroughToday()) {
-    const status = getDateStatus(date);
-
-    if (date === today) {
-      if (status === "failed") streak = 0;
-      else if (status === "complete") streak += 1;
-      // Incomplete today does not destroy yesterday's streak yet.
-      continue;
-    }
-
+  for (const date of dates) {
+    const status = dailyCompletionLog[date];
     if (status === "complete") streak += 1;
-    else streak = 0;
+    else if (status === "failed" || status === "missed") streak = 0;
   }
 
   return streak;
 }
 
 function calculateHistoricalBestStreak() {
-  const today = getToday();
+  syncDailyCompletionLog();
+  const dates = Object.keys(dailyCompletionLog).sort();
   let run = 0;
   let best = 0;
 
-  for (const date of getActiveQuestDatesThroughToday()) {
-    const status = getDateStatus(date);
-
-    if (date === today && status === "incomplete") continue;
-
+  for (const date of dates) {
+    const status = dailyCompletionLog[date];
     if (status === "complete") {
       run += 1;
       best = Math.max(best, run);
-    } else if (status === "failed" || date < today) {
+    } else if (status === "failed" || status === "missed") {
       run = 0;
     }
   }
@@ -485,15 +705,21 @@ function refreshStreakData() {
 // OPERATOR ROTATION / MESSAGE HELPERS
 // ===================================
 
+function getUnlockedOperators(level = getLevelFromScore(score)) {
+  return operators.filter(operator => operator.unlockLevel <= level);
+}
+
 function getOperatorIndex() {
+  const unlocked = getUnlockedOperators();
   const start = new Date(2026, 8, 27, 0, 0, 0);
   const twelveHours = 12 * 60 * 60 * 1000;
   const blocksPassed = Math.floor((Date.now() - start.getTime()) / twelveHours);
-  return ((blocksPassed % operators.length) + operators.length) % operators.length;
+  return ((blocksPassed % unlocked.length) + unlocked.length) % unlocked.length;
 }
 
 function getCurrentOperator() {
-  return operators[getOperatorIndex()];
+  const unlocked = getUnlockedOperators();
+  return unlocked[getOperatorIndex()];
 }
 
 function getShiftText() {
@@ -544,8 +770,9 @@ function setOperatorVisual(imageState, message) {
   const current = getCurrentOperator();
   operatorName.textContent = current.name;
   operatorShift.textContent = getShiftText();
-  const nextIndex = (getOperatorIndex() + 1) % operators.length;
-  nextOperator.textContent = `NEXT // ${operators[nextIndex].name}`;
+  const unlocked = getUnlockedOperators();
+  const nextIndex = (getOperatorIndex() + 1) % unlocked.length;
+  nextOperator.textContent = `NEXT // ${unlocked[nextIndex].name}`;
   operatorImage.src = current.images[imageState] || current.images.normal;
   operatorMessage.textContent = message;
 }
@@ -628,8 +855,8 @@ function queueOperatorEvents(events) {
 }
 
 function getStreakCelebrationMessage(streak) {
-  const operatorIndex = getOperatorIndex();
   const current = getCurrentOperator();
+  const operatorIndex = operators.indexOf(current);
   const hour = new Date().getHours();
 
   if (hour >= 23 && streak >= 7) {
@@ -654,6 +881,149 @@ function getRewardMessage(reward) {
     level: reward.level,
     reward: reward.name
   });
+}
+
+// ===================================
+// FULL SCREEN EVENT SYSTEM
+// ===================================
+
+let fullScreenEventQueue = [];
+let fullScreenEventRunning = false;
+let fullScreenEventTimer = null;
+
+function showFullScreenEvent(event) {
+  fullScreenEvent.dataset.accent = event.accent || "cyan";
+  eventKicker.textContent = event.kicker || "SYSTEM EVENT";
+  eventTitle.textContent = event.title || "MISSION UPDATE";
+  eventSubtitle.textContent = event.subtitle || "";
+  eventMessage.textContent = event.message || "";
+
+  if (event.image) {
+    eventOperatorWrap.classList.remove("no-image");
+    eventOperatorImage.src = event.image;
+    eventOperatorName.textContent = event.operatorName || "";
+  } else {
+    eventOperatorWrap.classList.add("no-image");
+    eventOperatorImage.removeAttribute("src");
+    eventOperatorName.textContent = event.operatorName || "";
+  }
+
+  fullScreenEvent.classList.add("show");
+  fullScreenEvent.setAttribute("aria-hidden", "false");
+}
+
+function hideFullScreenEvent() {
+  fullScreenEvent.classList.remove("show");
+  fullScreenEvent.setAttribute("aria-hidden", "true");
+}
+
+function runNextFullScreenEvent() {
+  clearTimeout(fullScreenEventTimer);
+
+  if (fullScreenEventQueue.length === 0) {
+    hideFullScreenEvent();
+    fullScreenEventRunning = false;
+    showOperator("idle");
+    return;
+  }
+
+  fullScreenEventRunning = true;
+  const event = fullScreenEventQueue.shift();
+  showFullScreenEvent(event);
+  fullScreenEventTimer = setTimeout(runNextFullScreenEvent, event.duration || 4200);
+}
+
+function queueFullScreenEvents(events) {
+  if (!Array.isArray(events) || events.length === 0) return;
+  fullScreenEventQueue.push(...events);
+  if (!fullScreenEventRunning) runNextFullScreenEvent();
+}
+
+eventSkipButton.addEventListener("click", runNextFullScreenEvent);
+
+function buildLevelUpEvent(oldLevel, newLevel, operator = getCurrentOperator()) {
+  const current = operator;
+  return {
+    kicker: "LEVEL UP",
+    title: `LEVEL ${newLevel}`,
+    subtitle: `LEVEL ${oldLevel} → ${newLevel}  //  TOTAL XP ${score}`,
+    image: current.images.happy,
+    operatorName: current.name,
+    message: randomMessage(current.messages.levelUp, `${current.name}-fullscreen-levelup`),
+    duration: 4300,
+    accent: newLevel >= 75 ? "gold" : newLevel >= 50 ? "violet" : "cyan"
+  };
+}
+
+function buildOperatorUnlockEvent(operator) {
+  return {
+    kicker: "NEW OPERATOR UNLOCKED",
+    title: operator.name,
+    subtitle: `LEVEL ${operator.unlockLevel} REWARD`,
+    image: operator.images.happy,
+    operatorName: operator.name,
+    message: randomMessage(operator.intro || operator.messages.daily, `${operator.name}-intro`),
+    duration: 5200,
+    accent: operator.unlockLevel >= 50 ? "gold" : "cyan"
+  };
+}
+
+function buildStreakEvent(streak) {
+  const current = getCurrentOperator();
+  return {
+    kicker: "STREAK MILESTONE",
+    title: `${streak} DAYS`,
+    subtitle: "DAILY CLEAR STREAK",
+    image: current.images.happy,
+    operatorName: current.name,
+    message: getStreakCelebrationMessage(streak),
+    duration: 5200,
+    accent: streak >= 30 ? "gold" : "cyan"
+  };
+}
+
+function buildLevel100Events() {
+  const messages = [
+    "ここまで来たんだ。長かったね。",
+    "100って……ほんとに行くとは思わなかった。",
+    "積み重ねた結果だね。よく続けたよ。",
+    "LEVEL 100！！これはさすがに祝うしかないでしょ！",
+    "え、100！？ちょっと待って、普通にすごすぎ笑",
+    "ここまで続いたんだね。おめでとう。"
+  ];
+
+  const events = [{
+    kicker: "MASTER RANK ACHIEVED",
+    title: "LEVEL 100",
+    subtitle: "SPECIAL TRANSMISSION // INITIAL OPERATOR TEAM",
+    message: "初期オペレーター6名から通信が入っています。",
+    duration: 3200,
+    accent: "gold"
+  }];
+
+  operators.slice(0, 6).forEach((operator, index) => {
+    events.push({
+      kicker: `SPECIAL TRANSMISSION 0${index + 1}/06`,
+      title: operator.name,
+      subtitle: "LEVEL 100 CELEBRATION",
+      image: operator.images.happy,
+      operatorName: operator.name,
+      message: messages[index],
+      duration: 4300,
+      accent: "gold"
+    });
+  });
+
+  events.push({
+    kicker: "MASTER REWARD UNLOCKED",
+    title: "MASTER PACKAGE",
+    subtitle: "ALT COSTUMES // MASTER VOICE SET",
+    message: "初期6人の新衣装とLv.100限定ボイスを追加できる状態になりました。",
+    duration: 5200,
+    accent: "gold"
+  });
+
+  return events;
 }
 
 // ===================================
@@ -830,17 +1200,21 @@ function showTodayQuests() {
       const streakBefore = calculateDailyStreak();
       const bestBefore = bestDailyStreak;
       const oldLevel = getLevelFromScore(score);
+      const currentOperatorBeforeLevelUp = getCurrentOperator();
 
       score += quest.xp;
       quest.completed = true;
       questClearStreak += 1;
       localStorage.setItem("questClearStreakV2", String(questClearStreak));
-      localStorage.setItem("clearStreakDate", getToday());
 
       const newLevel = getLevelFromScore(score);
       const unlockedRewards = getRewardsUnlockedBetween(oldLevel, newLevel);
+      const newlyUnlockedOperators = operators.filter(
+        operator => operator.unlockLevel > oldLevel && operator.unlockLevel <= newLevel
+      );
 
       saveQuests();
+      syncDailyCompletionLog();
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
@@ -848,50 +1222,46 @@ function showTodayQuests() {
       const streakAfter = calculateDailyStreak();
       const finishedToday = areTodayQuestsComplete();
       const newBest = bestDailyStreak > bestBefore;
-      const events = [];
+      const fullEvents = [];
 
       if (newLevel > oldLevel) {
         playLevelUpEffect();
-        showAchievement("LEVEL UP", `LEVEL ${newLevel}`, `${getTitle(newLevel)} // TOTAL XP ${score}`);
+        fullEvents.push(buildLevelUpEvent(oldLevel, newLevel, currentOperatorBeforeLevelUp));
+
+        newlyUnlockedOperators.forEach(operator => {
+          fullEvents.push(buildOperatorUnlockEvent(operator));
+        });
+
+        if (newLevel >= 100 && oldLevel < 100) {
+          fullEvents.push(...buildLevel100Events());
+        }
 
         if (unlockedRewards.length > 0) {
           const reward = unlockedRewards[unlockedRewards.length - 1];
-          events.push({
-            state: "custom",
-            payload: { image: "happy", message: getRewardMessage(reward) },
-            duration: 5600
-          });
           showAchievement("REWARD UNLOCKED", reward.name, reward.description);
-        } else {
-          events.push({ state: "levelUp", duration: 5200 });
         }
       }
 
       if (finishedToday && streakAfter > streakBefore) {
         playStreakCelebration();
         const milestone = [3, 7, 14, 30, 50, 100].includes(streakAfter);
-        showAchievement(
-          milestone ? "STREAK MILESTONE" : "DAILY CLEAR",
-          `${streakAfter} DAY STREAK`,
-          milestone ? "SPECIAL OPERATOR MESSAGE UNLOCKED" : "今日のクエストを全て達成"
-        );
-        events.push({
-          state: "custom",
-          payload: { image: "happy", message: getStreakCelebrationMessage(streakAfter) },
-          duration: milestone ? 6500 : 5400
-        });
 
-        if (newBest) {
-          events.push({
-            state: "custom",
-            payload: { image: "happy", message: getBestStreakMessage(streakAfter) },
-            duration: 5200
+        if (milestone) {
+          fullEvents.push(buildStreakEvent(streakAfter));
+        } else {
+          showAchievement("DAILY CLEAR", `${streakAfter} DAY STREAK`, "今日のクエストを全て達成");
+        }
+
+        if (newBest && !milestone) {
+          temporaryOperatorState("custom", 5200, {
+            image: "happy",
+            message: getBestStreakMessage(streakAfter)
           });
         }
       }
 
-      if (events.length > 0) {
-        queueOperatorEvents(events);
+      if (fullEvents.length > 0) {
+        queueFullScreenEvents(fullEvents);
       } else if (finishedToday) {
         temporaryOperatorState("complete");
       } else if (questClearStreak >= 2) {
@@ -908,6 +1278,7 @@ function showTodayQuests() {
       questClearStreak = 0;
       localStorage.setItem("questClearStreakV2", "0");
       saveQuests();
+      syncDailyCompletionLog();
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
@@ -918,6 +1289,7 @@ function showTodayQuests() {
       if (!confirm(`「${quest.name}」を削除しますか？`)) return;
       quests.splice(realIndex, 1);
       saveQuests();
+      syncDailyCompletionLog();
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
@@ -1065,6 +1437,7 @@ addQuestButton.addEventListener("click", () => {
 
   quests.push({ name: questName, xp: questXp, date: questDate, completed: false, failed: false });
   saveQuests();
+  syncDailyCompletionLog();
   updatePlayer();
   showTodayQuests();
   showWeekPlan();
@@ -1123,6 +1496,7 @@ saveRewardButton.addEventListener("click", () => {
 
 todayText.textContent = displayDate(getToday());
 questDateInput.value = getToday();
+syncDailyCompletionLog();
 updatePlayer();
 showTodayQuests();
 showWeekPlan();
@@ -1161,7 +1535,7 @@ setInterval(() => {
     lastKnownDate = newDate;
     questClearStreak = 0;
     localStorage.setItem("questClearStreakV2", "0");
-    localStorage.setItem("clearStreakDate", newDate);
+    syncDailyCompletionLog();
     todayText.textContent = displayDate(newDate);
     questDateInput.value = newDate;
     updatePlayer();
