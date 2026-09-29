@@ -36,14 +36,14 @@ let selectedTheme = localStorage.getItem("selectedTheme") || "cyan";
 
 const rewards = [
   { level: 5,  name: "ROOKIE TITLE", description: "称号 ROOKIE を解放", type: "title" },
-  { level: 10, name: "OPERATOR 07 + AGENT", description: "OPERATOR 07・称号 AGENT・VIOLET UI を解放", type: "operator", operatorId: 7 },
+  { level: 10, name: "AGENT + VIOLET THEME", description: "称号 AGENT と VIOLET UI を解放", type: "theme", theme: "violet" },
   { level: 15, name: "STAR BADGE", description: "15 LEVEL 到達バッジを解放", type: "badge" },
-  { level: 20, name: "OPERATOR 08 + ELITE", description: "OPERATOR 08・称号 ELITE・CRIMSON UI を解放", type: "operator", operatorId: 8 },
+  { level: 20, name: "ELITE + CRIMSON THEME", description: "称号 ELITE と CRIMSON UI を解放", type: "theme", theme: "crimson" },
   { level: 30, name: "ACE + GOLD THEME", description: "称号 ACE と GOLD UI を解放", type: "theme", theme: "gold" },
-  { level: 35, name: "OPERATOR 09", description: "OPERATOR 09 を解放", type: "operator", operatorId: 9 },
+  { level: 35, name: "MISSION EMBLEM", description: "35 LEVEL 到達記念エンブレムを解放", type: "badge" },
   { level: 40, name: "MASTER + EMERALD THEME", description: "称号 MASTER と EMERALD UI を解放", type: "theme", theme: "emerald" },
-  { level: 50, name: "OPERATOR 10 + LEGEND", description: "OPERATOR 10 と称号 LEGEND を解放", type: "operator", operatorId: 10 },
-  { level: 75, name: "OPERATOR 11 + COMMANDER", description: "OPERATOR 11・称号 COMMANDER・ICE UI を解放", type: "operator", operatorId: 11 },
+  { level: 50, name: "LEGEND BADGE", description: "称号 LEGEND と 50 LEVEL 記念バッジを解放", type: "badge" },
+  { level: 75, name: "COMMANDER + ICE THEME", description: "称号 COMMANDER と ICE UI を解放", type: "theme", theme: "ice" },
   { level: 100, name: "S-RANK MASTER PACKAGE", description: "称号 S-RANK・初期6人のALT衣装・MASTER VOICE SET・特別祝福イベントを解放", type: "master" }
 ];
 
@@ -249,7 +249,7 @@ const operators = [
   },
   {
     name: "OPERATOR 07",
-    unlockLevel: 10,
+    unlockLevel: 1,
     images: imgSet(7),
     intro: [
       "あ、今日から私も担当なんだって。よろしくね！……えっと、何すればいいんだっけ？",
@@ -280,7 +280,7 @@ const operators = [
   },
   {
     name: "OPERATOR 08",
-    unlockLevel: 20,
+    unlockLevel: 1,
     images: imgSet(8),
     intro: [
       "今日から私も担当に入るね。頑張りすぎる前に、ちゃんと頼ってね。",
@@ -311,7 +311,7 @@ const operators = [
   },
   {
     name: "OPERATOR 09",
-    unlockLevel: 35,
+    unlockLevel: 1,
     images: imgSet(9),
     intro: [
       "やっと私の番？昔から見てる感じで、これからも気楽にいこ。",
@@ -342,7 +342,7 @@ const operators = [
   },
   {
     name: "OPERATOR 10",
-    unlockLevel: 50,
+    unlockLevel: 1,
     images: imgSet(10),
     intro: [
       "やっと解放してくれたんだ。へえ、ここまで来れると思ってたよ。……たぶん。",
@@ -373,7 +373,7 @@ const operators = [
   },
   {
     name: "OPERATOR 11",
-    unlockLevel: 75,
+    unlockLevel: 1,
     images: imgSet(11),
     intro: [
       "Lv.75か。ここまで来たなら大したもんだね。今日から私も担当。よろしく。",
@@ -400,6 +400,33 @@ const operators = [
       rewardUnlock: ["LEVEL {level}。{reward}解放。おめでと。", "新しい報酬。ここまで来た分だね。", "アンロックか。ちゃんと受け取っときな。"],
       lateNightStreak: ["こんな時間までやってたの？……無理しすぎないで。今日はちゃんと休みな。", "{n}日連続はすごい。でも今は寝る方が大事。"],
       comeback: ["久しぶり。まあ、戻ってきたならいい。", "空いたね。今日からまたやればいいでしょ。"]
+    }
+  },
+  {
+    name: "OPERATOR 12",
+    unlockLevel: 1,
+    images: imgSet(12),
+    messages: {
+      morning: ["おはよー！今日もちゃんと来たね！", "朝からえらい！最初の一個、一緒に決めよ！", "おはよう！今日も元気にいこー！", "朝ってちょっと眠いよね。でも一個だけやっちゃお！"],
+      afternoon: ["午後もまだいけるよ！一緒に頑張ろ！", "ちょっと疲れてきた？じゃあ一回休んでから再開しよ！", "午後戦だね！あと少しずつ進めよー！", "ここからサボったらもったいないよ！"],
+      night: ["夜までお疲れさま！残りだけ確認しよ！", "もう夜だね。無理しないで、できる分だけやろ！", "今日も結構頑張ったね！終わったらちゃんと休んでよ？", "夜だー。あと一個だけならいけそう？"],
+      daily: ["今日も来たね！じゃあ一緒に頑張ろー！", "Life Game起動！今日もよろしくね！", "おかえりー！今日の予定見よ見よ！", "今日も担当するね！ちゃんと見てるから！"],
+      add: ["新しいクエスト追加！ちゃんと終わらせようね！", "予定増えたね！無理しすぎない範囲でいこ！", "追加完了ー！あとで忘れたとかなしだよ？", "お、クエスト増えた！一緒に回収しよ！"],
+      success: ["クリアしたじゃん！えらいえらい！", "やったー！ちゃんと終わったね！", "ナイス！次もいけそう！", "一個終わり！ちゃんと進んでるね！"],
+      questStreak: ["またクリア！？今日めっちゃいい感じ！", "連続じゃん！そのままいこー！", "え、また終わったの？すごいすごい！", "この流れ止めたくないね！次もいける？"],
+      fail: ["失敗しちゃった？じゃあ次で取り返そ！", "大丈夫大丈夫！一個くらい気にしない！", "今日はちょっと難しかったね。次いこ次！", "HP減っちゃったね。無理する前に休もう？"],
+      complete: ["全部終わったー！今日はもう大勝利だね！", "全クリ！ほんとにお疲れさま！", "え、全部終わったの！？すごいじゃん！", "今日の任務ぜんぶ完了！いっぱい褒める！"],
+      levelUp: ["レベル上がった！すごいじゃん、ちゃんと強くなってる！", "LEVEL UP！やったねー！", "また一個上がった！次の報酬も見よ！", "レベル更新！私まで嬉しい！"],
+      half: ["半分終わったよ！いいペース！", "折り返しー！ここまで来たらもう少し！", "もう半分？ちゃんと進んでるじゃん！", "半分クリア！一回休憩してもいいよ！"],
+      almost: ["あとちょっと！最後までいこー！", "もうほぼ終わりじゃん！ここでやめるのもったいない！", "ゴール見えてるよ！ラスト一個！", "あと少し！終わったらゆっくりしよ！"],
+      noQuest: ["今日は予定ないんだ！じゃあ休みかな？", "クエストゼロだね。たまにはのんびりしよ！", "今日は空いてるね！無理に予定入れなくてもいいよ！", "何もない日も大事だよー。"],
+      lowHp: ["HP低いよ！今日はちゃんと休んで！", "ちょっと頑張りすぎじゃない？休憩しよ？", "そのHPは危ないやつ！無理しないでね！", "今日は回復優先！お願いだからちゃんと休んで！"],
+      talk: ["なになに？呼んだ？", "どうしたのー？少し話す？", "また押した！私と話したかった？", "ちゃんとクエストもやってる？", "今日はどんな感じ？私に教えて！", "暇ならちょっとだけ雑談しよ！"],
+      dailyStreak: ["{n}日連続！すごいじゃん！", "STREAK {n} DAYS！今日もつながったね！", "{n}日目クリアー！このまま伸ばそ！", "今日も記録更新！ほんとにえらい！"],
+      bestStreak: ["自己ベスト更新！{n}日！やったね！", "新記録じゃん！私まで嬉しい！", "BEST STREAK更新！今日はいっぱい褒める！", "{n}日が新記録！次も狙お！"],
+      rewardUnlock: ["LEVEL {level}！{reward}解放だよ！", "新しい報酬きたー！{reward}！", "アンロックおめでとう！ちゃんと頑張った分だね！", "{reward}ゲット！次も楽しみだね！"],
+      lateNightStreak: ["こんな時間までやって{n}日連続！？すごいけど、もう寝よ？", "記録も大事だけど睡眠も大事！今日はもう休んでね！", "夜更かししすぎ！{n}日続いてるんだから今日は十分だよ！"],
+      comeback: ["久しぶりー！戻ってきてくれてうれしい！", "おかえり！また今日から一緒にやろ！", "少し空いたね。でも戻ってきたなら全然OK！" ]
     }
   }
 ];
@@ -685,6 +712,21 @@ const voiceProfiles = [
     dailyA: ["今日も来たね。", "起動したんだ。", "今日もやる？", "おかえり。"],
     dailyB: ["やるならさっさとやろ。", "一個ずつ片付ければいい。", "無理に気合い入れなくていいよ。", "今日も普通にいこ。"],
     rare: ["よく頑張ったね。たまにはちゃんと褒めとく。", "ここまで続けてるの、普通にすごいよ。", "無理しすぎないで。……本当に倒れたら困るから。"]
+  },
+  {
+    successA: ["やったー！", "クリア！", "ちゃんと終わったね！", "えらいえらい！", "一個完了ー！"],
+    successB: ["その調子でいこ！", "次もいけそう！", "私まで嬉しい！", "今日はいい感じ！", "ちゃんと進んでるじゃん！"],
+    failA: ["あ、失敗かー。", "今回はダメだったね。", "HP減っちゃった。", "ちょっと惜しかったね。"],
+    failB: ["次で取り返そ！", "気にしすぎなくて大丈夫！", "一回休んでからまたやろ！", "今日は無理しないでね！"],
+    talkA: ["なになに？", "呼んだー？", "どうしたの？", "また押した！", "少し話す？"],
+    talkB: ["ちゃんとクエストもやろうね！", "私も応援してるよ！", "今日の調子どう？", "ちょっとだけなら雑談しよ！", "頑張ってるならいっぱい褒める！"],
+    levelA: ["LEVEL UP！", "レベル上がったー！", "また強くなったね！", "数字増えた！"],
+    levelB: ["すごいじゃん！", "次の報酬も楽しみ！", "ちゃんと積み重なってるね！", "私までテンション上がる！"],
+    streakA: ["{n}日連続！", "STREAK {n} DAYS！", "今日もつながった！", "{n}日目クリアー！"],
+    streakB: ["ほんとにえらい！", "このまま伸ばそ！", "毎日続けてるのすごい！", "明日も一緒に頑張ろ！"],
+    dailyA: ["今日も来たね！", "おかえりー！", "Life Game起動！", "今日も始めよー！"],
+    dailyB: ["一緒に頑張ろ！", "まず一個やっちゃお！", "今日も私が見てるよ！", "無理しないペースでいこ！"],
+    rare: ["ずっと頑張ってるの、本当にすごいと思ってるよ！", "今日は妹から特別に大褒めしてあげる！よく頑張った！", "無理してる時はちゃんと分かるからね。今日は休んでもいいんだよ。"]
   }
 ];
 
@@ -1078,7 +1120,8 @@ const operatorSwitchVoices = {
   8: ["今日は私が担当ね。ふふ、ちゃんと見ててあげる。", "私を選んでくれたのね。無理しすぎないようにね。", "じゃあ今日はお姉さんに任せて。ちゃんと最後まで見てるから。"],
   9: ["今日は私なんだ。なんか昔みたいでいいね。", "私選んだんだ。じゃあ今日もいつも通りいこ。", "はいはい、今日は私ね。ちゃんと付き合うよ。"],
   10: ["私選ぶんだ？へえ。……後悔しても知らないよ？", "今日の担当、私？見る目あるじゃん。たぶん。", "わざわざ私にするんだ。ふふ、じゃあ退屈させないでね。"],
-  11: ["今日は私？了解。じゃ、さっさと片付けよ。", "私を選んだんだ。まあ、悪くない選択じゃない？", "担当ね。ちゃんとやるなら付き合うよ。……最後までね。"]
+  11: ["今日は私？了解。じゃ、さっさと片付けよ。", "私を選んだんだ。まあ、悪くない選択じゃない？", "担当ね。ちゃんとやるなら付き合うよ。……最後までね。"],
+  12: ["今日は私なんだ！やったー、一緒に頑張ろ！", "私選んでくれたの？うれしい！今日もちゃんと見てるね！", "担当OP12！元気にいこー！最初のクエストどれにする？"]
 };
 
 function getOperatorSwitchVoice(operator) {
