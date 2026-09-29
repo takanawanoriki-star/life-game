@@ -2015,3 +2015,434 @@ body[data-theme="ice"] {
   .event-operator-wrap { height: 38vh; }
   .event-message { font-size: 15px; line-height: 1.65; }
 }
+
+/* =========================================
+   MOBILE CALENDAR + COMPACT PLAYER V5
+========================================= */
+
+.mobile-weekly-section,
+.mobile-quest-sheet,
+.mobile-player-details-button {
+  display: none;
+}
+
+@media (max-width: 750px) {
+  body {
+    padding-bottom: 135px;
+  }
+
+  /* Compact PLAYER */
+  .player {
+    padding: 16px;
+    margin-bottom: 18px;
+    clip-path: none;
+    border-radius: 8px;
+  }
+
+  .player::before {
+    top: 9px;
+    right: 12px;
+    font-size: 7px;
+    letter-spacing: 1px;
+  }
+
+  .player > h2 {
+    margin-bottom: 10px;
+  }
+
+  .player-info {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .player-info p {
+    padding: 9px 7px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .player-info span {
+    margin-top: 4px;
+    font-size: 18px;
+  }
+
+  .progression-grid {
+    grid-template-columns: 1.25fr 1fr 1fr;
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .progress-card {
+    min-height: 0;
+    padding: 8px;
+    border-top-width: 1px;
+  }
+
+  .progress-label {
+    font-size: 6px;
+    letter-spacing: 0.8px;
+  }
+
+  .progress-card strong {
+    margin-top: 4px;
+    font-size: 12px;
+    line-height: 1.2;
+  }
+
+  .progress-card small {
+    display: none;
+  }
+
+  .bar-title {
+    margin: 10px 0 4px;
+    font-size: 7px;
+  }
+
+  .bar {
+    height: 8px;
+    padding: 1px;
+  }
+
+  .reward-panel {
+    margin-top: 10px;
+    padding: 10px;
+  }
+
+  .reward-panel-head {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .reward-panel h3 {
+    margin-top: 3px;
+    font-size: 13px;
+  }
+
+  .reward-xp {
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .reward-name {
+    margin: 7px 0 0;
+    font-size: 12px;
+  }
+
+  .reward-description,
+  .my-reward-row,
+  .saved-reward-text,
+  .unlock-panel,
+  .reset-button {
+    display: none;
+  }
+
+  .player.mobile-details-open .reward-description,
+  .player.mobile-details-open .my-reward-row,
+  .player.mobile-details-open .saved-reward-text,
+  .player.mobile-details-open .unlock-panel,
+  .player.mobile-details-open .reset-button {
+    display: block;
+  }
+
+  .player.mobile-details-open .my-reward-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-player-details-button {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 7px;
+    background: rgba(0, 217, 255, 0.04);
+    color: var(--text-sub);
+    border: 1px solid rgba(0, 217, 255, 0.18);
+    font-size: 8px;
+    letter-spacing: 2px;
+  }
+
+  /* Desktop input / long lists are replaced by calendar-first mobile UI */
+  .new-quest-section,
+  .today-section,
+  .weekly-section {
+    display: none;
+  }
+
+  .mobile-weekly-section {
+    display: block;
+    margin-bottom: 22px;
+  }
+
+  .mobile-week-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .mobile-week-header h2 {
+    margin: 0 0 4px;
+    color: var(--trion-soft);
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+
+  .mobile-week-header h2::before {
+    content: "// ";
+  }
+
+  .mobile-week-buttons {
+    display: flex;
+    gap: 5px;
+  }
+
+  .mobile-week-buttons button {
+    padding: 7px 9px;
+    min-width: 34px;
+    font-size: 10px;
+  }
+
+  .mobile-calendar-hint {
+    margin: 8px 0 9px;
+    color: #64889a;
+    font-size: 9px;
+    letter-spacing: 0.4px;
+  }
+
+  .mobile-week-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 88px;
+    gap: 7px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    padding: 2px 2px 8px;
+    scroll-snap-type: inline mandatory;
+  }
+
+  .mobile-day-card {
+    scroll-snap-align: start;
+    min-height: 112px;
+    padding: 9px 7px;
+    background: rgba(8, 22, 33, 0.95);
+    border: 1px solid #25475a;
+    border-top: 2px solid #31596f;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .mobile-day-card.today {
+    border-color: var(--trion);
+    border-top-color: var(--trion);
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.12);
+  }
+
+  .mobile-day-name {
+    color: #7597a9;
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .mobile-day-date {
+    margin-top: 2px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .mobile-day-count {
+    margin-top: 8px;
+    color: var(--trion-soft);
+    font-size: 9px;
+  }
+
+  .mobile-day-preview {
+    margin-top: 7px;
+    color: #9eb7c3;
+    font-size: 8px;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .mobile-day-card.today .mobile-day-date::after {
+    content: " TODAY";
+    color: var(--trion);
+    font-size: 6px;
+    letter-spacing: 0.6px;
+  }
+
+  /* Bottom sheet */
+  .mobile-quest-sheet {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    display: block;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .mobile-quest-sheet.open {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobile-quest-sheet-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(0, 4, 8, 0.68);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  .mobile-quest-sheet.open .mobile-quest-sheet-backdrop {
+    opacity: 1;
+  }
+
+  .mobile-quest-sheet-panel {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    max-height: 78vh;
+    overflow-y: auto;
+    padding: 10px 14px calc(18px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(9, 27, 40, 0.995), rgba(3, 12, 19, 0.995));
+    border-top: 1px solid var(--trion);
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -18px 55px rgba(0,0,0,.45), 0 0 22px rgba(0,217,255,.12);
+    transform: translateY(105%);
+    transition: transform 0.25s ease;
+  }
+
+  .mobile-quest-sheet.open .mobile-quest-sheet-panel {
+    transform: translateY(0);
+  }
+
+  .mobile-sheet-handle {
+    width: 42px;
+    height: 4px;
+    margin: 0 auto 10px;
+    border-radius: 10px;
+    background: #426578;
+  }
+
+  .mobile-sheet-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #24485d;
+  }
+
+  .mobile-sheet-kicker {
+    color: var(--trion-soft);
+    font-size: 7px;
+    letter-spacing: 2px;
+  }
+
+  .mobile-sheet-head h3 {
+    margin: 3px 0 0;
+    color: #fff;
+    font-size: 19px;
+  }
+
+  .mobile-sheet-close {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 20px;
+  }
+
+  .mobile-sheet-list {
+    display: grid;
+    gap: 7px;
+    margin-top: 11px;
+  }
+
+  .mobile-sheet-quest {
+    padding: 10px;
+    background: rgba(0,0,0,.18);
+    border: 1px solid #24485d;
+    border-left: 2px solid var(--trion);
+    border-radius: 5px;
+  }
+
+  .mobile-sheet-quest-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .mobile-sheet-quest-name {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 650;
+  }
+
+  .mobile-sheet-quest-xp {
+    color: var(--trion-soft);
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  .mobile-sheet-quest-status {
+    margin-top: 4px;
+    color: #728f9e;
+    font-size: 8px;
+  }
+
+  .mobile-sheet-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    margin-top: 8px;
+  }
+
+  .mobile-sheet-actions button {
+    padding: 7px 4px;
+    font-size: 9px;
+  }
+
+  .mobile-sheet-add {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #24485d;
+  }
+
+  .mobile-sheet-add input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .mobile-sheet-add-row {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 7px;
+    margin-top: 7px;
+  }
+
+  .mobile-sheet-add-row button {
+    min-height: 42px;
+    color: #051219;
+    background: var(--trion);
+    border-color: var(--trion);
+  }
+
+  body.mobile-sheet-open {
+    overflow: hidden;
+  }
+}

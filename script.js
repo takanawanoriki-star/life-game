@@ -860,6 +860,31 @@ const eventMessage = document.getElementById("eventMessage");
 const eventSkipButton = document.getElementById("eventSkipButton");
 
 // ===================================
+// MOBILE UI
+// ===================================
+
+const mobileWeekPlan = document.getElementById("mobileWeekPlan");
+const mobileWeekRangeText = document.getElementById("mobileWeekRangeText");
+const mobilePrevWeekButton = document.getElementById("mobilePrevWeekButton");
+const mobileCurrentWeekButton = document.getElementById("mobileCurrentWeekButton");
+const mobileNextWeekButton = document.getElementById("mobileNextWeekButton");
+const mobileQuestSheet = document.getElementById("mobileQuestSheet");
+const mobileQuestSheetBackdrop = document.getElementById("mobileQuestSheetBackdrop");
+const mobileQuestSheetClose = document.getElementById("mobileQuestSheetClose");
+const mobileQuestSheetTitle = document.getElementById("mobileQuestSheetTitle");
+const mobileQuestSheetList = document.getElementById("mobileQuestSheetList");
+const mobileQuestName = document.getElementById("mobileQuestName");
+const mobileQuestXp = document.getElementById("mobileQuestXp");
+const mobileQuestAddButton = document.getElementById("mobileQuestAddButton");
+const mobilePlayerDetailsButton = document.getElementById("mobilePlayerDetailsButton");
+
+let mobileSelectedDate = getToday();
+
+function isMobileLayout() {
+  return window.matchMedia("(max-width: 750px)").matches;
+}
+
+// ===================================
 // DATE HELPERS
 // ===================================
 
@@ -1526,6 +1551,7 @@ function showTodayQuests() {
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
+      showMobileWeekPlan();
 
       const streakAfter = calculateDailyStreak();
       const finishedToday = areTodayQuestsComplete();
@@ -1590,6 +1616,7 @@ function showTodayQuests() {
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
+      showMobileWeekPlan();
       temporaryOperatorState("fail");
     });
 
@@ -1601,6 +1628,7 @@ function showTodayQuests() {
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
+      showMobileWeekPlan();
       showOperator("idle");
     });
 
@@ -1700,6 +1728,7 @@ function showWeekPlan() {
         updatePlayer();
         showTodayQuests();
         showWeekPlan();
+      showMobileWeekPlan();
         showOperator("idle");
       });
       box.appendChild(deleteButton);
@@ -1712,6 +1741,207 @@ function showWeekPlan() {
 
     weekPlan.appendChild(dayColumn);
   }
+}
+
+// ===================================
+// MOBILE CALENDAR / QUEST SHEET
+// ===================================
+
+function getQuestStatusText(quest) {
+  if (quest.completed) return "✓ CLEAR";
+  if (quest.failed) return "FAILED";
+  return "PLANNED";
+}
+
+function showMobileWeekPlan() {
+  if (!mobileWeekPlan || !mobileWeekRangeText) return;
+
+  mobileWeekPlan.innerHTML = "";
+  const monday = getDisplayedMonday();
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  mobileWeekRangeText.textContent = `${displayDate(formatDate(monday))} 〜 ${displayDate(formatDate(sunday))}`;
+  const weekdayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
+
+  let todayCard = null;
+
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    const dateString = formatDate(date);
+    const dayQuests = quests.filter(q => q.date === dateString);
+
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "mobile-day-card";
+    if (dateString === getToday()) {
+      card.classList.add("today");
+      todayCard = card;
+    }
+
+    const weekday = document.createElement("div");
+    weekday.className = "mobile-day-name";
+    weekday.textContent = weekdayNames[i];
+
+    const dateNumber = document.createElement("div");
+    dateNumber.className = "mobile-day-date";
+    dateNumber.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
+
+    const count = document.createElement("div");
+    count.className = "mobile-day-count";
+    const cleared = dayQuests.filter(q => q.completed).length;
+    count.textContent = dayQuests.length === 0 ? "予定なし" : `${cleared}/${dayQuests.length} CLEAR`;
+
+    const preview = document.createElement("div");
+    preview.className = "mobile-day-preview";
+    preview.textContent = dayQuests.length === 0
+      ? "＋ タップして追加"
+      : dayQuests.slice(0, 2).map(q => q.name).join(" / ");
+
+    card.append(weekday, dateNumber, count, preview);
+    card.addEventListener("click", () => openMobileQuestSheet(dateString));
+    mobileWeekPlan.appendChild(card);
+  }
+
+  if (todayCard && weekOffset === 0) {
+    requestAnimationFrame(() => {
+      todayCard.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    });
+  }
+}
+
+function renderMobileQuestSheet() {
+  if (!mobileQuestSheetList) return;
+
+  mobileQuestSheetTitle.textContent = `${displayDate(mobileSelectedDate)} の予定`;
+  mobileQuestSheetList.innerHTML = "";
+
+  const dayQuests = quests.filter(q => q.date === mobileSelectedDate);
+
+  if (dayQuests.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-message";
+    empty.textContent = "この日のクエストはまだありません。";
+    mobileQuestSheetList.appendChild(empty);
+    return;
+  }
+
+  dayQuests.forEach(quest => {
+    const box = document.createElement("div");
+    box.className = "mobile-sheet-quest";
+
+    const top = document.createElement("div");
+    top.className = "mobile-sheet-quest-top";
+
+    const name = document.createElement("div");
+    name.className = "mobile-sheet-quest-name";
+    name.textContent = quest.name;
+
+    const xp = document.createElement("div");
+    xp.className = "mobile-sheet-quest-xp";
+    xp.textContent = `+${quest.xp} XP`;
+    top.append(name, xp);
+
+    const status = document.createElement("div");
+    status.className = "mobile-sheet-quest-status";
+    status.textContent = getQuestStatusText(quest);
+
+    box.append(top, status);
+
+    const actions = document.createElement("div");
+    actions.className = "mobile-sheet-actions";
+
+    if (mobileSelectedDate === getToday()) {
+      const clear = document.createElement("button");
+      clear.type = "button";
+      clear.className = "clear-button";
+      clear.textContent = quest.completed ? "クリア済み" : "達成";
+      clear.disabled = quest.completed || quest.failed;
+      clear.addEventListener("click", () => {
+        const todayButtons = [...todayQuestList.querySelectorAll(".quest-card")];
+        const index = quests.filter(q => q.date === getToday()).indexOf(quest);
+        const sourceButton = todayButtons[index]?.querySelector(".clear-button");
+        if (sourceButton) sourceButton.click();
+        renderMobileQuestSheet();
+        showMobileWeekPlan();
+      });
+
+      const fail = document.createElement("button");
+      fail.type = "button";
+      fail.className = "fail-button";
+      fail.textContent = quest.failed ? "失敗済み" : "失敗";
+      fail.disabled = quest.completed || quest.failed;
+      fail.addEventListener("click", () => {
+        const todayButtons = [...todayQuestList.querySelectorAll(".quest-card")];
+        const index = quests.filter(q => q.date === getToday()).indexOf(quest);
+        const sourceButton = todayButtons[index]?.querySelector(".fail-button");
+        if (sourceButton) sourceButton.click();
+        renderMobileQuestSheet();
+        showMobileWeekPlan();
+      });
+
+      actions.append(clear, fail);
+    }
+
+    const del = document.createElement("button");
+    del.type = "button";
+    del.className = "delete-button";
+    del.textContent = "削除";
+    del.addEventListener("click", () => {
+      if (!confirm(`「${quest.name}」を削除しますか？`)) return;
+      const index = quests.indexOf(quest);
+      if (index !== -1) quests.splice(index, 1);
+      saveQuests();
+      syncDailyCompletionLog();
+      updatePlayer();
+      showTodayQuests();
+      showWeekPlan();
+      showMobileWeekPlan();
+      renderMobileQuestSheet();
+      showOperator("idle");
+    });
+
+    actions.appendChild(del);
+    box.appendChild(actions);
+    mobileQuestSheetList.appendChild(box);
+  });
+}
+
+function openMobileQuestSheet(dateString) {
+  if (!mobileQuestSheet || !isMobileLayout()) return;
+  mobileSelectedDate = dateString;
+  questDateInput.value = dateString;
+  mobileQuestName.value = "";
+  mobileQuestXp.value = "";
+  renderMobileQuestSheet();
+  mobileQuestSheet.classList.add("open");
+  mobileQuestSheet.setAttribute("aria-hidden", "false");
+  document.body.classList.add("mobile-sheet-open");
+  setTimeout(() => mobileQuestName.focus(), 260);
+}
+
+function closeMobileQuestSheet() {
+  if (!mobileQuestSheet) return;
+  mobileQuestSheet.classList.remove("open");
+  mobileQuestSheet.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("mobile-sheet-open");
+}
+
+function addQuestFromMobileSheet() {
+  const name = mobileQuestName.value.trim();
+  const xp = Number(mobileQuestXp.value);
+
+  if (!name || !Number.isFinite(xp) || xp <= 0) {
+    alert("クエスト名とXPを入力してください");
+    return;
+  }
+
+  questNameInput.value = name;
+  questXpInput.value = String(xp);
+  questDateInput.value = mobileSelectedDate;
+  addQuestButton.click();
+  mobileQuestName.value = "";
+  mobileQuestXp.value = "";
+  renderMobileQuestSheet();
+  showMobileWeekPlan();
 }
 
 // ===================================
@@ -1752,6 +1982,7 @@ addQuestButton.addEventListener("click", () => {
   updatePlayer();
   showTodayQuests();
   showWeekPlan();
+  showMobileWeekPlan();
   questNameInput.value = "";
   questXpInput.value = "";
   temporaryOperatorState("add", 6000);
@@ -1769,16 +2000,19 @@ resetLevelButton.addEventListener("click", () => {
 prevWeekButton.addEventListener("click", () => {
   weekOffset--;
   showWeekPlan();
+  showMobileWeekPlan();
 });
 
 currentWeekButton.addEventListener("click", () => {
   weekOffset = 0;
   showWeekPlan();
+  showMobileWeekPlan();
 });
 
 nextWeekButton.addEventListener("click", () => {
   weekOffset++;
   showWeekPlan();
+  showMobileWeekPlan();
 });
 
 themeSelect.addEventListener("change", () => {
@@ -1799,6 +2033,53 @@ saveRewardButton.addEventListener("click", () => {
   localStorage.setItem("customRewards", JSON.stringify(customRewards));
   renderNextReward(level);
   showAchievement("MY REWARD SAVED", `LEVEL ${next.level}`, value || "MY REWARDを削除しました");
+});
+
+// Mobile UI events
+if (mobilePrevWeekButton) {
+  mobilePrevWeekButton.addEventListener("click", () => {
+    weekOffset--;
+    showWeekPlan();
+    showMobileWeekPlan();
+  });
+}
+
+if (mobileCurrentWeekButton) {
+  mobileCurrentWeekButton.addEventListener("click", () => {
+    weekOffset = 0;
+    showWeekPlan();
+    showMobileWeekPlan();
+  });
+}
+
+if (mobileNextWeekButton) {
+  mobileNextWeekButton.addEventListener("click", () => {
+    weekOffset++;
+    showWeekPlan();
+    showMobileWeekPlan();
+  });
+}
+
+if (mobileQuestSheetClose) mobileQuestSheetClose.addEventListener("click", closeMobileQuestSheet);
+if (mobileQuestSheetBackdrop) mobileQuestSheetBackdrop.addEventListener("click", closeMobileQuestSheet);
+if (mobileQuestAddButton) mobileQuestAddButton.addEventListener("click", addQuestFromMobileSheet);
+if (mobileQuestXp) {
+  mobileQuestXp.addEventListener("keydown", event => {
+    if (event.key === "Enter") addQuestFromMobileSheet();
+  });
+}
+
+if (mobilePlayerDetailsButton) {
+  mobilePlayerDetailsButton.addEventListener("click", () => {
+    const player = document.querySelector(".player");
+    const isOpen = player.classList.toggle("mobile-details-open");
+    mobilePlayerDetailsButton.textContent = isOpen ? "CLOSE DETAILS" : "DETAILS";
+    mobilePlayerDetailsButton.setAttribute("aria-expanded", String(isOpen));
+  });
+}
+
+window.addEventListener("resize", () => {
+  if (!isMobileLayout()) closeMobileQuestSheet();
 });
 
 // ===================================
@@ -1852,6 +2133,7 @@ setInterval(() => {
     updatePlayer();
     showTodayQuests();
     showWeekPlan();
+  showMobileWeekPlan();
     showOperator("daily");
     localStorage.setItem("lastGreetingDate", newDate);
     localStorage.setItem("lastVisitDate", newDate);

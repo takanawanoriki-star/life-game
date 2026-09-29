@@ -29,7 +29,7 @@
   </div>
 
   <!-- PLAYER -->
-  <section class="player">
+  <section class="player player-section">
     <h2>PLAYER</h2>
 
     <div class="player-info">
@@ -92,11 +92,29 @@
       <div id="rewardBadges" class="reward-badges"></div>
     </div>
 
+    <button id="mobilePlayerDetailsButton" class="mobile-player-details-button" type="button" aria-expanded="false">DETAILS</button>
     <button id="resetLevelButton" class="reset-button">LEVEL RESET</button>
   </section>
 
+  <!-- MOBILE QUICK WEEKLY PLAN -->
+  <section class="mobile-weekly-section" id="mobileWeeklySection">
+    <div class="mobile-week-header">
+      <div>
+        <h2>WEEKLY PLAN</h2>
+        <p id="mobileWeekRangeText" class="date-text"></p>
+      </div>
+      <div class="mobile-week-buttons">
+        <button id="mobilePrevWeekButton" type="button">←</button>
+        <button id="mobileCurrentWeekButton" type="button">今週</button>
+        <button id="mobileNextWeekButton" type="button">→</button>
+      </div>
+    </div>
+    <p class="mobile-calendar-hint">日付をタップして、その日の予定を確認・追加</p>
+    <div id="mobileWeekPlan" class="mobile-week-grid"></div>
+  </section>
+
   <!-- NEW QUEST -->
-  <section>
+  <section class="new-quest-section">
     <h2>NEW QUEST</h2>
     <div class="quest-form">
       <input id="questName" type="text" placeholder="クエスト名">
@@ -107,14 +125,14 @@
   </section>
 
   <!-- TODAY -->
-  <section>
+  <section class="today-section">
     <h2>TODAY'S QUEST</h2>
     <p id="todayText" class="date-text"></p>
     <div id="todayQuestList"></div>
   </section>
 
   <!-- WEEKLY -->
-  <section>
+  <section class="weekly-section">
     <div class="week-header">
       <div>
         <h2>WEEKLY PLAN</h2>
@@ -130,6 +148,31 @@
     <div id="weekPlan" class="week-grid"></div>
   </section>
 
+
+  <!-- MOBILE QUEST SHEET -->
+  <div id="mobileQuestSheet" class="mobile-quest-sheet" aria-hidden="true">
+    <button id="mobileQuestSheetBackdrop" class="mobile-quest-sheet-backdrop" type="button" aria-label="閉じる"></button>
+    <div class="mobile-quest-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="mobileQuestSheetTitle">
+      <div class="mobile-sheet-handle"></div>
+      <div class="mobile-sheet-head">
+        <div>
+          <span class="mobile-sheet-kicker">MISSION SCHEDULE</span>
+          <h3 id="mobileQuestSheetTitle">予定</h3>
+        </div>
+        <button id="mobileQuestSheetClose" class="mobile-sheet-close" type="button">×</button>
+      </div>
+
+      <div id="mobileQuestSheetList" class="mobile-sheet-list"></div>
+
+      <div class="mobile-sheet-add">
+        <input id="mobileQuestName" type="text" placeholder="クエスト名">
+        <div class="mobile-sheet-add-row">
+          <input id="mobileQuestXp" type="number" min="1" placeholder="XP">
+          <button id="mobileQuestAddButton" type="button">＋ 追加</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- FULL SCREEN EVENT -->
   <div id="fullScreenEvent" class="full-screen-event" aria-live="polite" aria-hidden="true">
