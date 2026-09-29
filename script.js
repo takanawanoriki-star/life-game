@@ -504,6 +504,306 @@ const milestoneMessages = [
   }
 ];
 
+
+// ===================================
+// VOICE SYSTEM V4
+//  - large rule-based variation (no API)
+//  - remembers the last 5 lines per operator/category
+//  - rare voices / click-spam / late-night / high-level variants
+// ===================================
+
+const voiceHistoryKey = "lifeGameVoiceHistoryV4";
+let voiceHistory = {};
+try {
+  voiceHistory = JSON.parse(localStorage.getItem(voiceHistoryKey)) || {};
+} catch (_) {
+  voiceHistory = {};
+}
+
+const voiceProfiles = [
+  {
+    successA: ["お見事。", "よし、", "一件完了。", "ちゃんと終わらせたね。", "いいね。"],
+    successB: ["その調子で進めよ。", "積み重なってるよ。", "次も焦らずいこう。", "今の進め方、悪くないよ。", "今日は流れがいいね。"],
+    failA: ["今回はうまくいかなかったね。", "失敗は確認。", "今日は崩れたか。", "一回落としたね。"],
+    failB: ["次で取り返せばいいよ。", "原因だけ覚えて切り替えよ。", "これで全部が無駄になるわけじゃない。", "今日は無理に引きずらなくていいよ。"],
+    talkA: ["どうしたの？", "呼んだ？", "少し話す？", "進捗、見てるよ。", "休憩中？"],
+    talkB: ["ちゃんと見てるから大丈夫。", "任務じゃない話でもいいよ。", "でも戻る時間は忘れないでね。", "焦ってるなら一回整理しよ。", "今日もちゃんと前に進んでるよ。"],
+    levelA: ["LEVEL UP。", "また一段上がったね。", "レベル更新。", "ちゃんと数字に出たね。"],
+    levelB: ["積み重ねた結果だよ。", "次の報酬も見えてきたね。", "このまま続けていこう。", "偶然じゃなくて継続の結果だね。"],
+    streakA: ["{n}日連続。", "STREAK {n} DAYS。", "今日も記録をつないだね。", "{n}日目クリア。"],
+    streakB: ["ちゃんと続いてるね。", "いい習慣になってきたよ。", "ここまで来たのは大きいよ。", "明日も無理なくつなげよ。"],
+    dailyA: ["今日も来たね。", "システム起動。", "今日の任務、確認しよ。", "また一日始まるね。"],
+    dailyB: ["焦らず一つずついこう。", "まず最初の一件から。", "今日もちゃんと見てるよ。", "無理のないペースでね。"],
+    rare: ["ここまで続けてるの、ちゃんとすごいと思う。", "結果だけじゃなくて、戻ってくること自体が強さだよ。", "今日は少しくらい自分を褒めてもいいんじゃない？"]
+  },
+  {
+    successA: ["お、クリア。", "やったじゃん。", "ちゃんとできたね。", "へえ、終わらせたんだ。", "一個片付いたじゃん。"],
+    successB: ["結構いい感じ。", "やればできるじゃん。", "今日はちゃんとしてるね。", "次もそのままいけそう。", "まあ、褒めてあげる。"],
+    failA: ["あー、失敗か。", "今回はダメだったね。", "落としたじゃん。", "んー、惜しい。"],
+    failB: ["次はちゃんとやろ？", "一回くらいなら取り返せるって。", "落ち込むより次いこ。", "またやればいいでしょ。"],
+    talkA: ["なに？", "また呼んだ？", "暇なの？", "どうしたの？", "はいはい、なに？"],
+    talkB: ["ちゃんと任務もやってよね。", "少しくらいなら相手するけど。", "サボる口実にはしないでよ？", "まあ、今日頑張ってるなら許す。", "そんなに話したかった？"],
+    levelA: ["レベル上がったじゃん。", "LEVEL UP！", "また上がった。", "お、レベル更新。"],
+    levelB: ["結構やるね。", "ちゃんと強くなってるじゃん。", "意外と続いてるね。", "次の報酬も狙お。"],
+    streakA: ["{n}日連続じゃん。", "STREAK {n} DAYS。", "また記録つないだね。", "{n}日目クリア。"],
+    streakB: ["結構やるじゃん。", "意外と根性あるね。", "今日はちゃんと褒めてあげる。", "ここまで来たらもっと伸ばしたくない？"],
+    dailyA: ["今日も来たんだ。", "お、起動した。", "またちゃんと開いたね。", "はい今日も開始。"],
+    dailyB: ["サボらないでよ？", "今日もよろしく。", "まず一個やろ。", "ちゃんと最後まで見てるからね。"],
+    rare: ["……まあ、頑張ってるのはちゃんと分かってるよ。", "ここまで続けてるなら、ちょっとくらい自信持っていいんじゃない？", "言わないだけで、結構すごいと思ってる。"]
+  },
+  {
+    successA: ["いいじゃん。", "ナイス。", "一件完了だね。", "計画通り。", "よくできた。"],
+    successB: ["今のペースなら十分。", "ちゃんと積み上がってるよ。", "次も同じように進めよう。", "無理に飛ばさなくて大丈夫。", "この流れを大事にしよう。"],
+    failA: ["今回は失敗だね。", "予定通りにはいかなかったね。", "一件落としたね。", "今日は少し崩れたか。"],
+    failB: ["原因を一つ確認して次に進もう。", "引きずる必要はないよ。", "修正すれば大丈夫。", "次の一件で立て直そう。"],
+    talkA: ["どうした？", "何か相談？", "一回整理する？", "進み方で迷ってる？", "休憩かな？"],
+    talkB: ["次の一件だけ決めればいいよ。", "焦る必要はないからね。", "休むのも予定のうちだよ。", "今できることからで大丈夫。", "継続できる形を優先しよう。"],
+    levelA: ["LEVEL UP。", "一段上がったね。", "レベル更新だね。", "成長が数字に出たね。"],
+    levelB: ["積み重ねた結果だよ。", "この調子を維持しよう。", "次の節目まで一つずつ。", "無理なく続けていこう。"],
+    streakA: ["{n}日継続。", "STREAK {n} DAYS。", "{n}日目も完了。", "今日も連続記録を更新。"],
+    streakB: ["習慣として形になってきたね。", "継続力が数字に出てるよ。", "安定して続けられてるね。", "このペースを大事にしよう。"],
+    dailyA: ["今日も始めようか。", "まず予定を確認しよう。", "新しい一日だね。", "準備できた？"],
+    dailyB: ["優先順位から決めよう。", "無理のない計画でいこう。", "最初の一件を選ぼう。", "今日も確実に進めよう。"],
+    rare: ["続ける力は、調子が悪い日に戻ってこられるかで決まるよ。", "ここまでの記録は、ちゃんと君が作ったものだよ。", "焦らなくていい。長く続けてること自体が強いから。"]
+  },
+  {
+    successA: ["よっしゃー！", "CLEAR！", "一個撃破！", "ナイスー！", "任務完了！"],
+    successB: ["そのまま次いこー！", "XPいただき！", "今日つよいぞ！", "いい流れ来てる！", "次のターゲットどれだー！"],
+    failA: ["あちゃー！", "MISSION FAILED！", "やっちゃったー！", "HP減ったー！"],
+    failB: ["でもゲームオーバーじゃない！", "次いこ次！", "回復してからリトライ！", "一個くらい気にすんなー！"],
+    talkA: ["なになに？", "呼んだー？", "雑談タイム？", "はいどうぞー！", "クリック確認！"],
+    talkB: ["でもXPは増えませーん！笑", "終わったら任務戻れよー！", "今日は何レベル上げる？", "元気ならもう一個いこー！", "私はいつでも応援担当！"],
+    levelA: ["レベルアップきたー！", "LEVEL UP！！", "また強くなったー！", "レベル上昇！"],
+    levelB: ["演出入りまーす！", "次の報酬まで突っ走れ！", "これは祝うしかない！", "いいぞそのままー！"],
+    streakA: ["{n}連勝きたー！", "STREAK {n} DAYS！", "{n}日イベント継続！", "今日も勝利ー！"],
+    streakB: ["このまま記録伸ばせー！", "強すぎ！", "連勝止めんなよー！", "次のマイルストーン狙おうぜ！"],
+    dailyA: ["本日のLife Gameスタートー！", "ログイン確認！", "今日もミッション祭り！", "朝でも夜でも開始ー！"],
+    dailyB: ["何からやるー？", "一発目いってみよー！", "今日もXP稼ぐぞー！", "準備できたらGO！"],
+    rare: ["ここまで続けてるの、マジで強いって！", "今日は特別に大拍手しとく！", "こういう積み重ねが一番ゲームっぽくて好きだわ！"]
+  },
+  {
+    successA: ["え、やるじゃん。", "ナイスー。", "お、終わった。", "クリアじゃん。", "ちゃんとできたんだ笑"],
+    successB: ["ちょっと見直したかも。", "今日は偉いねー。", "はい、褒めてあげます。", "次もいけそうじゃん。", "普通にすごくない？"],
+    failA: ["あーあ笑", "失敗じゃん。", "やっちゃったね。", "HP減ったー。"],
+    failB: ["次頑張ればセーフ！", "引きずるのは禁止ね。", "まあ、こういう日もあるって。", "今日は無理しすぎないでよ。"],
+    talkA: ["なにー？", "また押した笑", "暇なの？", "どうしたー？", "はいはい笑"],
+    talkB: ["私と話してないでクエストやったら？笑", "まあちょっとなら話すけど。", "ちゃんと頑張ってる？", "サボってたらバレるよ笑", "今日の分終わったらもっと話してあげる。"],
+    levelA: ["え、レベル上がった！", "LEVEL UPじゃん！", "また強くなってる。", "レベル更新ー。"],
+    levelB: ["普通にすごくない？笑", "今日はちゃんと褒める。", "地味に続いてるの偉い。", "次の報酬も欲しくない？"],
+    streakA: ["え、{n}日も続いてる！", "STREAK {n} DAYS！", "また記録つないだじゃん。", "{n}日目クリアー。"],
+    streakB: ["普通にすご。", "思ったより根性あるじゃん笑", "今日はちゃんと褒める。", "ここまで来たらもっと伸ばそ。"],
+    dailyA: ["今日も来たじゃん。", "Life Game起動ー。", "またちゃんと開いてる。", "はい今日も開始。"],
+    dailyB: ["ちゃんとやるんでしょ？", "私が見張っときます笑", "最初の一個やろー。", "今日も頑張ってください笑"],
+    rare: ["……まあ、本当に頑張ってる時はちゃんと分かるよ。", "ここまで続けてるなら、さすがにちょっと尊敬する笑", "今日はからかわないで褒めとく。よくやってる。"]
+  },
+  {
+    successA: ["お、終わったね。", "クリアできた。", "一つ進んだね。", "ちゃんと終わったんだ。", "いい感じ。"],
+    successB: ["その調子でいこ。", "無理なく続けよ。", "ちゃんと進んでるよ。", "次もゆっくりで大丈夫。", "いいペースだと思う。"],
+    failA: ["今日はダメだったか。", "今回は残念だったね。", "一つ失敗か。", "うまくいかなかったね。"],
+    failB: ["そんなに気にしなくていいよ。", "次はうまくいくと思う。", "今日は少し休んでもいいかも。", "また次からで大丈夫。"],
+    talkA: ["どうしたの？", "呼んだ？", "少し話す？", "休憩中？", "なにかあった？"],
+    talkB: ["焦らなくていいよ。", "少しなら付き合うよ。", "ちゃんと進んでるから大丈夫。", "無理してないならそれでいい。", "今日も来てくれてるね。"],
+    levelA: ["レベル上がったね。", "LEVEL UPだね。", "また一つ上がった。", "レベル更新。"],
+    levelB: ["ちゃんと進んでるよ。", "少しずつ強くなってるね。", "続けた分が出てると思う。", "次もゆっくりいこ。"],
+    streakA: ["{n}日連続だね。", "STREAK {n} DAYS。", "今日もつながった。", "{n}日目だね。"],
+    streakB: ["ちゃんと続けられてるよ。", "静かに記録伸びてるね。", "こういう積み重ね、いいと思う。", "無理せずこのままいこ。"],
+    dailyA: ["今日も来たね。", "今日も始めよ。", "また一日だね。", "起動したね。"],
+    dailyB: ["ゆっくり進めよ。", "何から始める？", "焦らなくて大丈夫。", "一つだけでも進めよ。"],
+    rare: ["毎日ちゃんと戻ってきてるの、すごいと思う。", "あんまり言わないけど、結構頑張ってるよね。", "今日も来てくれて、ちょっと安心した。"]
+  },
+  {
+    successA: ["わ、終わった！", "お、クリア！", "できたー！", "ちゃんと終わったね！", "一個なくなった！"],
+    successB: ["えらいえらい！", "次もいけそう！", "XP増えたよね？たぶん！", "私までちょっと嬉しい。", "この調子でいこー！"],
+    failA: ["あ、失敗になってる。", "あれ、ダメだった？", "うわ、HP減った。", "今回は失敗かー。"],
+    failB: ["見なかったことにする？……ダメ？", "次ならいけるよ！", "まあ、お菓子食べてから考えよ。", "気にしすぎなくて大丈夫！"],
+    talkA: ["なになに？", "呼んだ？", "どうしたのー？", "私？", "暇になった？"],
+    talkB: ["あ、私も何話すか考えてなかった。", "ちゃんとクエストもやろうね！私が言うの変だけど。", "少し休憩しよー。", "今日の調子どう？", "えっと……何の話だっけ？"],
+    levelA: ["レベル上がった！", "LEVEL UPだー！", "また上がったね！", "わ、数字増えた！"],
+    levelB: ["すごい！……で、何ができるようになるの？", "ちゃんと強くなってる！", "次の報酬見よ見よ！", "私もなんか嬉しい！"],
+    streakA: ["{n}日連続！", "STREAK {n} DAYS！", "今日も続いたね！", "{n}日目だー！"],
+    streakB: ["そんなに続いてるの？すごい！", "明日もつなげよー！", "えらすぎる！", "私、数え間違えてないよね？"],
+    dailyA: ["今日も来たー！", "おはよ……じゃないかも。", "今日も担当だよ！", "Life Game起動ー！"],
+    dailyB: ["何からやる？", "私も応援する！", "まず一個だけやろー！", "えっと、今日もよろしくね！"],
+    rare: ["あのね、ずっと続けてるの本当にすごいと思う。……あ、今ちょっと真面目だった？", "私が忘れてても、この記録はちゃんと覚えてるからね！", "今日は特別にいっぱい褒める日！勝手に決めた！"]
+  },
+  {
+    successA: ["よくできました。", "ちゃんと終わったのね。", "一件クリアね。", "えらいえらい。", "いい子ね。"],
+    successB: ["その調子で大丈夫よ。", "ちゃんと見てたわよ。", "次も焦らなくていいからね。", "頑張った分、休憩もしてね。", "今日はよく進められてるわ。"],
+    failA: ["今日はうまくいかなかったのね。", "今回は失敗ね。", "少し疲れてたかな。", "あら、HP減っちゃったね。"],
+    failB: ["大丈夫、次に立て直せばいいの。", "自分を責めなくていいよ。", "今日は少し休んでもいいのよ。", "また一緒にやり直そ。"],
+    talkA: ["どうしたの？", "こっちおいで。", "何か話したい？", "少し休憩する？", "呼んだの？"],
+    talkB: ["ちゃんと聞くよ。", "頑張りすぎてない？", "焦らなくて大丈夫だからね。", "今日もちゃんと偉いよ。", "少し甘えてもいいのよ。"],
+    levelA: ["レベル上がったの？", "LEVEL UPね。", "また成長したね。", "一段上がったのね。"],
+    levelB: ["ふふ、ちゃんと頑張ってるね。", "よく続けられて偉いよ。", "今日はいっぱい褒めてあげる。", "次の報酬も楽しみね。"],
+    streakA: ["{n}日続いたね。", "STREAK {n} DAYS。", "今日も記録つないだのね。", "{n}日目クリアね。"],
+    streakB: ["毎日頑張れて偉いよ。", "本当に立派。", "無理しないでこのまま続けようね。", "ちゃんと積み重なってるよ。"],
+    dailyA: ["今日も来たのね。", "おかえり。", "今日も始めましょうか。", "ちゃんと来られて偉いね。"],
+    dailyB: ["まず一つずつね。", "無理しないで進めようね。", "今日も私が見てるから。", "頑張りすぎなくていいのよ。"],
+    rare: ["ここまで頑張ってきたの、ちゃんと知ってるよ。よく頑張ったね。", "たまには何もしないで甘えてもいいんだからね。", "本当に偉い。今日はそれだけ覚えておいて。"]
+  },
+  {
+    successA: ["お、終わったんだ。", "ちゃんとできたじゃん。", "一個片付いたね。", "やっぱりやる時はやるね。", "クリアか。"],
+    successB: ["昔からそういうとこあるよね。", "次も無理しないでいこ。", "ちゃんと見てたよ。", "今日はいい感じじゃん。", "まあ、知ってたけど。"],
+    failA: ["まあ、こういう日もあるでしょ。", "今日は失敗か。", "うまくいかなかったね。", "一個落としたか。"],
+    failB: ["次ちゃんとやればいいって。", "そんな顔しなくていいよ。", "また明日から戻せばいい。", "ずっと完璧なんて無理でしょ。"],
+    talkA: ["なに？", "どうした？", "また話す？", "休憩？", "なんかあった？"],
+    talkB: ["昔から考えすぎるとこあるよね。", "まあ私には言っていいでしょ。", "少し休んだらまた戻ろ。", "今日もちゃんとやってるじゃん。", "無理して格好つけなくていいって。"],
+    levelA: ["レベル上がったじゃん。", "LEVEL UPか。", "また一個上がったね。", "ちゃんと伸びてるじゃん。"],
+    levelB: ["なんかちょっと嬉しいかも。", "昔から見てると感慨深いね。", "このまま続けなよ。", "次もちゃんと見届けるから。"],
+    streakA: ["{n}日連続。", "STREAK {n} DAYS。", "今日も続いたじゃん。", "{n}日目だね。"],
+    streakB: ["なんだかんだ根性あるよね。", "ここまで続くとちょっと嬉しい。", "明日も普通に来なよ。", "ちゃんと積み重なってるじゃん。"],
+    dailyA: ["今日も来たんだ。", "お、また始める？", "今日もやるんだね。", "おかえり。"],
+    dailyB: ["まず何からやる？", "まあいつも通りいこ。", "無理しない程度にね。", "今日も付き合うよ。"],
+    rare: ["ずっと見てるから分かるけど、前よりちゃんと強くなってるよ。", "こういうの、昔から最後はちゃんとやるよね。", "無理な日は私の前くらい弱音吐いていいって。"]
+  },
+  {
+    successA: ["へえ、終わらせたんだ。", "ちゃんとできたんだ。", "お、クリア。", "意外とやるじゃん。", "一個片付いたね。"],
+    successB: ["思ったより優秀かも。", "褒めてほしい？", "まあ、悪くないんじゃない。", "次もできたら本物だね。", "今日は機嫌よく褒めてあげる。"],
+    failA: ["あ、失敗したんだ。", "ふふ、落としたね。", "今回はダメだったか。", "あらら。"],
+    failB: ["まあそういう時もあるよね。", "次はちゃんとしてね？", "落ち込む顔、ちょっと面白いけど切り替えよ。", "本当に倒れたらつまんないから休みなよ。"],
+    talkA: ["なに？", "また私？", "そんなに話したいの？", "暇なのかな？", "はい、どうぞ。"],
+    talkB: ["ちゃんとやること終わってる？", "まあ少しくらいなら相手してあげる。", "私に構ってる時間あるんだ？", "頑張ってるなら優しくしてあげてもいいよ。", "……その顔だと放っておけないか。"],
+    levelA: ["レベル上がったじゃん。", "LEVEL UPね。", "また強くなった？", "へえ、更新したんだ。"],
+    levelB: ["調子乗らない程度に喜んでいいよ。", "まあ、ちゃんとすごい。", "次も期待してあげる。", "ここまで来たなら褒めとこっか。"],
+    streakA: ["{n}日連続。", "STREAK {n} DAYS。", "まだ続いてるんだ。", "{n}日目もクリアね。"],
+    streakB: ["意外と根性あるね。", "本気だったんだ。", "ここまで来たら途切れさせたくないでしょ？", "まあ、かなり偉いんじゃない。"],
+    dailyA: ["今日も来たんだ。", "また始めるの？", "ログイン確認。", "おかえり。"],
+    dailyB: ["今日はどこまでできるかな？", "途中で逃げないでね。", "私が見ててあげる。", "まあ、頑張ってみたら？"],
+    rare: ["……本当は結構頑張ってるって思ってるよ。言わせないで。", "倒れられると困るから、今日はちゃんと休んで。", "ここまで続けてるのは素直にすごい。今だけは茶化さない。"]
+  },
+  {
+    successA: ["終わったんだ。", "はい、クリア。", "ちゃんとやったね。", "一個終了。", "悪くないじゃん。"],
+    successB: ["そのまま続ければ。", "いいペース。", "やる時はやるんだね。", "次も普通にいこ。", "そういうの嫌いじゃない。"],
+    failA: ["まあ失敗は失敗。", "今回はダメだったね。", "一個落としたか。", "予定通りじゃなかったね。"],
+    failB: ["引きずるより次。", "立て直すのが先でしょ。", "今日は休むのもあり。", "またやればいいだけ。"],
+    talkA: ["なに？", "どうした。", "話す？", "また押したね。", "休憩？"],
+    talkB: ["やること終わってるならいいけど。", "少しくらいなら付き合う。", "考えすぎる前に一個やれば。", "まあ、ちゃんと見てるよ。", "……無理してないならいい。"],
+    levelA: ["レベルアップおめでと。", "LEVEL UP。", "また上がったね。", "レベル更新。"],
+    levelB: ["結構頑張ってるじゃん。", "ここまで来たなら大したもん。", "そのまま続けな。", "今日はちゃんと褒めとく。"],
+    streakA: ["{n}日連続。", "STREAK {n} DAYS。", "今日もつながった。", "{n}日目ね。"],
+    streakB: ["ここまで来たら立派。", "ちゃんと続けてるね。", "悪くない記録じゃん。", "明日も普通にやればいい。"],
+    dailyA: ["今日も来たね。", "起動したんだ。", "今日もやる？", "おかえり。"],
+    dailyB: ["やるならさっさとやろ。", "一個ずつ片付ければいい。", "無理に気合い入れなくていいよ。", "今日も普通にいこ。"],
+    rare: ["よく頑張ったね。たまにはちゃんと褒めとく。", "ここまで続けてるの、普通にすごいよ。", "無理しすぎないで。……本当に倒れたら困るから。"]
+  }
+];
+
+function getVoiceProfile(operator) {
+  const index = operators.indexOf(operator);
+  return voiceProfiles[index] || voiceProfiles[0];
+}
+
+function combineVoiceParts(profile, category, values = {}) {
+  const a = profile[`${category}A`] || [];
+  const b = profile[`${category}B`] || [];
+  if (!a.length || !b.length) return [];
+  const out = [];
+  for (const left of a) {
+    for (const right of b) {
+      out.push(fillTemplate(`${left}${right}`, values));
+    }
+  }
+  return out;
+}
+
+function rememberVoice(key, line) {
+  const list = Array.isArray(voiceHistory[key]) ? voiceHistory[key] : [];
+  const next = [line, ...list.filter(item => item !== line)].slice(0, 5);
+  voiceHistory[key] = next;
+  try {
+    localStorage.setItem(voiceHistoryKey, JSON.stringify(voiceHistory));
+  } catch (_) {}
+}
+
+function pickFreshVoice(lines, key) {
+  const unique = [...new Set((lines || []).filter(Boolean))];
+  if (!unique.length) return "SYSTEM READY";
+  const recent = Array.isArray(voiceHistory[key]) ? voiceHistory[key] : [];
+  let available = unique.filter(line => !recent.includes(line));
+  if (!available.length) available = unique;
+  const line = available[Math.floor(Math.random() * available.length)];
+  rememberVoice(key, line);
+  return line;
+}
+
+function getVoice(operator, category, payload = {}) {
+  const profile = getVoiceProfile(operator);
+  const values = {
+    n: payload.n ?? calculateDailyStreak(),
+    level: payload.level ?? getLevelFromScore(score),
+    reward: payload.reward ?? "",
+    ...payload
+  };
+
+  const original = Array.isArray(operator.messages?.[category])
+    ? operator.messages[category].map(line => fillTemplate(line, values))
+    : [];
+
+  const categoryMap = {
+    success: "success",
+    questStreak: "success",
+    complete: "success",
+    fail: "fail",
+    talk: "talk",
+    levelUp: "level",
+    dailyStreak: "streak",
+    bestStreak: "streak",
+    rewardUnlock: "level",
+    daily: "daily",
+    morning: "daily",
+    afternoon: "daily",
+    night: "daily",
+    noQuest: "talk",
+    lowHp: "fail",
+    half: "success",
+    almost: "success",
+    comeback: "daily",
+    lateNightStreak: "streak"
+  };
+
+  const generated = combineVoiceParts(profile, categoryMap[category] || "talk", values);
+  let pool = [...original, ...generated];
+
+  const level = getLevelFromScore(score);
+  const hour = new Date().getHours();
+
+  if ((category === "talk" || category === "daily") && level >= 50) {
+    pool.push(
+      fillTemplate(`${profile.talkA?.[0] || ""}${profile.levelB?.[0] || ""}`, values),
+      fillTemplate(`${profile.dailyA?.[0] || ""}${profile.streakB?.[0] || ""}`, values)
+    );
+  }
+
+  // Around 3% rare voice chance in conversational moments.
+  if (["talk", "daily", "success", "complete"].includes(category) && Math.random() < 0.03 && profile.rare?.length) {
+    return `◆ RARE // ${pickFreshVoice(profile.rare.map(line => fillTemplate(line, values)), `${operator.name}-rare`)}`;
+  }
+
+  if (hour >= 0 && hour < 5 && ["talk", "daily", "night"].includes(category)) {
+    pool.push(...(operator.messages?.lateNightStreak || []).map(line => fillTemplate(line, values)));
+  }
+
+  return pickFreshVoice(pool, `${operator.name}-${category}`);
+}
+
+let operatorClickTimes = [];
+function getOperatorClickVoice(operator) {
+  const now = Date.now();
+  operatorClickTimes = operatorClickTimes.filter(time => now - time < 18000);
+  operatorClickTimes.push(now);
+
+  const count = operatorClickTimes.length;
+  const profile = getVoiceProfile(operator);
+  if (count >= 5) {
+    const spamLines = [
+      ...(profile.talkA || []).map((line, i) => `${line}${(profile.talkB || [])[i % (profile.talkB || []).length] || ""}`),
+      ...(operator.messages?.talk || [])
+    ];
+    return pickFreshVoice(spamLines, `${operator.name}-clickSpam`);
+  }
+  return getVoice(operator, "talk");
+}
+
 // ===================================
 // HTML REFERENCES
 // ===================================
@@ -752,16 +1052,11 @@ function getTimePeriod() {
 const recentMessages = {};
 function randomMessage(array, key = "default") {
   if (!Array.isArray(array) || array.length === 0) return "SYSTEM READY";
-  if (array.length === 1) return array[0];
-
-  let candidate;
-  let attempts = 0;
-  do {
-    candidate = array[Math.floor(Math.random() * array.length)];
-    attempts += 1;
-  } while (candidate === recentMessages[key] && attempts < 8);
-
-  recentMessages[key] = candidate;
+  const recent = Array.isArray(recentMessages[key]) ? recentMessages[key] : [];
+  let candidates = array.filter(item => !recent.includes(item));
+  if (!candidates.length) candidates = array;
+  const candidate = candidates[Math.floor(Math.random() * candidates.length)];
+  recentMessages[key] = [candidate, ...recent.filter(item => item !== candidate)].slice(0, 5);
   return candidate;
 }
 
@@ -815,35 +1110,35 @@ function showOperator(state = "idle", payload = {}) {
 
   if (stateMap[state]) {
     const [imageState, messageKey] = stateMap[state];
-    setOperatorVisual(imageState, randomMessage(current.messages[messageKey], key));
+    setOperatorVisual(imageState, getVoice(current, messageKey, payload));
     return;
   }
 
   if (hp <= 30) {
-    setOperatorVisual("serious", randomMessage(current.messages.lowHp, `${current.name}-lowHp`));
+    setOperatorVisual("serious", getVoice(current, "lowHp"));
     return;
   }
 
   const progress = getTodayProgress();
   if (progress.total === 0) {
-    setOperatorVisual("casual", randomMessage(current.messages.noQuest, `${current.name}-noQuest`));
+    setOperatorVisual("casual", getVoice(current, "noQuest"));
     return;
   }
   if (progress.completed === progress.total) {
-    setOperatorVisual("happy", randomMessage(current.messages.complete, `${current.name}-complete`));
+    setOperatorVisual("happy", getVoice(current, "complete"));
     return;
   }
   if (progress.rate >= 0.75) {
-    setOperatorVisual("normal", randomMessage(current.messages.almost, `${current.name}-almost`));
+    setOperatorVisual("normal", getVoice(current, "almost"));
     return;
   }
   if (progress.rate >= 0.5) {
-    setOperatorVisual("normal", randomMessage(current.messages.half, `${current.name}-half`));
+    setOperatorVisual("normal", getVoice(current, "half"));
     return;
   }
 
   const period = getTimePeriod();
-  setOperatorVisual(period === "night" ? "casual" : "normal", randomMessage(current.messages[period], `${current.name}-${period}`));
+  setOperatorVisual(period === "night" ? "casual" : "normal", getVoice(current, period));
 }
 
 function temporaryOperatorState(state, duration = 7000, payload = {}) {
@@ -876,27 +1171,24 @@ function getStreakCelebrationMessage(streak) {
   const hour = new Date().getHours();
 
   if (hour >= 23 && streak >= 7) {
-    return fillTemplate(randomMessage(current.messages.lateNightStreak, `${current.name}-lateNightStreak`), { n: streak });
+    return getVoice(current, "lateNightStreak", { n: streak });
   }
 
   if (milestoneMessages[operatorIndex][streak]) {
     return milestoneMessages[operatorIndex][streak];
   }
 
-  return fillTemplate(randomMessage(current.messages.dailyStreak, `${current.name}-dailyStreak`), { n: streak });
+  return getVoice(current, "dailyStreak", { n: streak });
 }
 
 function getBestStreakMessage(streak) {
   const current = getCurrentOperator();
-  return fillTemplate(randomMessage(current.messages.bestStreak, `${current.name}-bestStreak`), { n: streak });
+  return getVoice(current, "bestStreak", { n: streak });
 }
 
 function getRewardMessage(reward) {
   const current = getCurrentOperator();
-  return fillTemplate(randomMessage(current.messages.rewardUnlock, `${current.name}-rewardUnlock`), {
-    level: reward.level,
-    reward: reward.name
-  });
+  return getVoice(current, "rewardUnlock", { level: reward.level, reward: reward.name });
 }
 
 // ===================================
@@ -965,7 +1257,7 @@ function buildLevelUpEvent(oldLevel, newLevel, operator = getCurrentOperator()) 
     subtitle: `LEVEL ${oldLevel} → ${newLevel}  //  TOTAL XP ${score}`,
     image: current.images.happy,
     operatorName: current.name,
-    message: randomMessage(current.messages.levelUp, `${current.name}-fullscreen-levelup`),
+    message: getVoice(current, "levelUp", { level: newLevel }),
     duration: 4300,
     accent: newLevel >= 75 ? "gold" : newLevel >= 50 ? "violet" : "cyan"
   };
@@ -978,7 +1270,7 @@ function buildOperatorUnlockEvent(operator) {
     subtitle: `LEVEL ${operator.unlockLevel} REWARD`,
     image: operator.images.happy,
     operatorName: operator.name,
-    message: randomMessage(operator.intro || operator.messages.daily, `${operator.name}-intro`),
+    message: Array.isArray(operator.intro) && operator.intro.length ? pickFreshVoice(operator.intro, `${operator.name}-intro`) : getVoice(operator, "daily"),
     duration: 5200,
     accent: operator.unlockLevel >= 50 ? "gold" : "cyan"
   };
@@ -1434,10 +1726,13 @@ operatorImage.addEventListener("click", () => {
   if (hour >= 23 && currentStreak >= 7 && Math.random() < 0.45) {
     temporaryOperatorState("custom", 7000, {
       image: "casual",
-      message: fillTemplate(randomMessage(current.messages.lateNightStreak, `${current.name}-rareTalk`), { n: currentStreak })
+      message: getVoice(current, "lateNightStreak", { n: currentStreak })
     });
   } else {
-    temporaryOperatorState("talk", 6000);
+    temporaryOperatorState("custom", 6200, {
+      image: "casual",
+      message: getOperatorClickVoice(current)
+    });
   }
 });
 
@@ -1524,7 +1819,7 @@ if (lastVisitDate && daysBetween(lastVisitDate, getToday()) >= 3) {
   const current = getCurrentOperator();
   temporaryOperatorState("custom", 8000, {
     image: "casual",
-    message: randomMessage(current.messages.comeback, `${current.name}-comeback`)
+    message: getVoice(current, "comeback")
   });
 } else if (lastGreetingDate !== getToday()) {
   showOperator("daily");
