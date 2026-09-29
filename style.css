@@ -2446,3 +2446,238 @@ body[data-theme="ice"] {
     overflow: hidden;
   }
 }
+
+/* =========================================
+   MANUAL OPERATOR SELECTOR
+========================================= */
+
+.operator-change-button {
+  width: 100%;
+  margin-top: 7px;
+  padding: 6px 7px;
+  color: var(--trion-soft);
+  background: rgba(0, 217, 255, 0.07);
+  border: 1px solid rgba(0, 217, 255, 0.28);
+  font-size: 7px;
+  letter-spacing: 1.3px;
+  pointer-events: auto;
+}
+
+.operator-change-button:hover {
+  background: rgba(0, 217, 255, 0.16);
+}
+
+.operator-selector {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.operator-selector.open {
+  display: flex;
+}
+
+.operator-selector-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 6, 10, 0.86);
+  backdrop-filter: blur(8px);
+}
+
+.operator-selector-panel {
+  position: relative;
+  z-index: 1;
+  width: min(900px, 100%);
+  max-height: min(780px, 88vh);
+  overflow: auto;
+  padding: 24px;
+  background: linear-gradient(145deg, rgba(8, 27, 41, 0.99), rgba(3, 12, 20, 0.99));
+  border: 1px solid var(--border-light);
+  box-shadow: 0 0 45px rgba(0, 217, 255, 0.14);
+}
+
+.operator-selector-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.operator-selector-head h2 {
+  margin: 4px 0 5px;
+  color: #fff;
+  font-size: 23px;
+  letter-spacing: 3px;
+}
+
+.operator-selector-head p {
+  margin: 0;
+  color: var(--text-sub);
+  font-size: 11px;
+}
+
+.operator-selector-kicker {
+  color: var(--trion);
+  font-size: 8px;
+  letter-spacing: 2.5px;
+}
+
+.operator-selector-close {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.operator-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.operator-select-card {
+  position: relative;
+  min-width: 0;
+  padding: 10px;
+  text-align: left;
+  background: rgba(7, 22, 34, 0.92);
+  border: 1px solid #264b61;
+  overflow: hidden;
+}
+
+.operator-select-card:not(.locked):hover,
+.operator-select-card.current {
+  border-color: var(--trion);
+  box-shadow: inset 0 0 22px rgba(0, 217, 255, 0.08), 0 0 14px rgba(0, 217, 255, 0.11);
+}
+
+.operator-select-card.current::before {
+  content: "CURRENT";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 3;
+  padding: 3px 6px;
+  color: #06141c;
+  background: var(--trion);
+  font-size: 7px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.operator-select-card.locked {
+  opacity: 0.46;
+  cursor: not-allowed;
+  filter: grayscale(0.65);
+}
+
+.operator-select-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1.05;
+  overflow: hidden;
+  background: #03101a;
+  border: 1px solid rgba(120, 234, 255, 0.12);
+}
+
+.operator-select-image-wrap img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.operator-select-lock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.66);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.operator-select-info {
+  padding-top: 10px;
+}
+
+.operator-select-info strong,
+.operator-select-info span {
+  display: block;
+}
+
+.operator-select-info strong {
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.operator-select-info span {
+  margin-top: 4px;
+  color: var(--text-sub);
+  font-size: 8px;
+  letter-spacing: 0.8px;
+}
+
+body.operator-selector-open {
+  overflow: hidden;
+}
+
+@media (max-width: 750px) {
+  .operator-selector {
+    padding: 12px;
+    align-items: flex-end;
+  }
+
+  .operator-selector-panel {
+    width: 100%;
+    max-height: 82vh;
+    padding: 17px 14px calc(18px + env(safe-area-inset-bottom));
+    border-radius: 14px 14px 0 0;
+  }
+
+  .operator-selector-head h2 {
+    font-size: 17px;
+  }
+
+  .operator-selector-head p {
+    font-size: 9px;
+    line-height: 1.55;
+  }
+
+  .operator-selector-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .operator-select-card {
+    padding: 7px;
+  }
+
+  .operator-select-info strong {
+    font-size: 9px;
+  }
+
+  .operator-select-info span,
+  .operator-select-lock {
+    font-size: 7px;
+  }
+
+  .operator-change-button {
+    font-size: 6px;
+    padding: 5px 4px;
+  }
+}

@@ -830,6 +830,11 @@ const operatorName = document.getElementById("operatorName");
 const operatorMessage = document.getElementById("operatorMessage");
 const operatorShift = document.getElementById("operatorShift");
 const nextOperator = document.getElementById("nextOperator");
+const changeOperatorButton = document.getElementById("changeOperatorButton");
+const operatorSelector = document.getElementById("operatorSelector");
+const operatorSelectorBackdrop = document.getElementById("operatorSelectorBackdrop");
+const operatorSelectorClose = document.getElementById("operatorSelectorClose");
+const operatorSelectorGrid = document.getElementById("operatorSelectorGrid");
 const playerTitle = document.getElementById("playerTitle");
 const titleSubText = document.getElementById("titleSubText");
 const currentStreakText = document.getElementById("currentStreak");
@@ -1027,44 +1032,58 @@ function refreshStreakData() {
 }
 
 // ===================================
-// OPERATOR ROTATION / MESSAGE HELPERS
+// MANUAL OPERATOR SELECT / MESSAGE HELPERS
 // ===================================
+
+const selectedOperatorKey = "selectedOperatorIdV1";
+let selectedOperatorId = Number(localStorage.getItem(selectedOperatorKey)) || 1;
 
 function getUnlockedOperators(level = getLevelFromScore(score)) {
   return operators.filter(operator => operator.unlockLevel <= level);
 }
 
-function getOperatorIndex() {
-  const unlocked = getUnlockedOperators();
-  const start = new Date(2026, 8, 27, 0, 0, 0);
-  const fourHours = 4 * 60 * 60 * 1000;
-  const blocksPassed = Math.floor((Date.now() - start.getTime()) / fourHours);
-  return ((blocksPassed % unlocked.length) + unlocked.length) % unlocked.length;
+function getOperatorId(operator) {
+  return operators.indexOf(operator) + 1;
+}
+
+function ensureSelectedOperatorUnlocked() {
+  const level = getLevelFromScore(score);
+  const selected = operators[selectedOperatorId - 1];
+
+  if (!selected || selected.unlockLevel > level) {
+    selectedOperatorId = 1;
+    localStorage.setItem(selectedOperatorKey, "1");
+  }
+
+  return selectedOperatorId;
 }
 
 function getCurrentOperator() {
-  const unlocked = getUnlockedOperators();
-  return unlocked[getOperatorIndex()];
+  ensureSelectedOperatorUnlocked();
+  return operators[selectedOperatorId - 1] || operators[0];
 }
 
 function getShiftText() {
-  const hour = new Date().getHours();
-  const startHour = Math.floor(hour / 4) * 4;
-  const endHour = startHour + 3;
+  return "MANUAL SELECT";
+}
 
-  function to12Hour(h) {
-    const period = h < 12 ? "AM" : "PM";
-    const displayHour = h % 12 === 0 ? 12 : h % 12;
-    return displayHour + ":00 " + period;
-  }
+const operatorSwitchVoices = {
+  1: ["今日の担当、私にするんだ。了解。", "選んでくれたんだね。じゃあ今日も見てるよ。", "担当変更確認。よろしくね。"],
+  2: ["私にしたんだ。じゃ、ちゃんとやってよね。", "今日の担当は私？まあ、いいけど。", "選んだ以上、途中でサボらないでよ？"],
+  3: ["今日は私が担当だね。困ったら一緒に整理しよう。", "担当了解。無理のないペースで進めようね。", "私を選んだんだね。じゃあ今日もよろしく。"],
+  4: ["担当チェーンジ！今日は私でいこー！", "私きたー！今日は楽しく進めよ！", "選んでくれた！？よし、テンション上げてこ！"],
+  5: ["え、私選んだの？しょうがないなー笑", "今日は私なんだ。ちゃんとやったら褒めてあげる。", "また私？そんな好きなの？笑"],
+  6: ["今日は私なんだね。よろしく。", "担当変わったね。ゆっくり進めよう。", "選んでくれてありがとう。今日も見てるよ。"],
+  7: ["あ、今日は私なんだ！よろしくね！……えっと、何するんだっけ？", "私選ばれた！じゃあ一緒に頑張ろー。……私は見てるだけだけど。", "今日の担当わたし？やった。……で、最初なにする？"],
+  8: ["今日は私が担当ね。ふふ、ちゃんと見ててあげる。", "私を選んでくれたのね。無理しすぎないようにね。", "じゃあ今日はお姉さんに任せて。ちゃんと最後まで見てるから。"],
+  9: ["今日は私なんだ。なんか昔みたいでいいね。", "私選んだんだ。じゃあ今日もいつも通りいこ。", "はいはい、今日は私ね。ちゃんと付き合うよ。"],
+  10: ["私選ぶんだ？へえ。……後悔しても知らないよ？", "今日の担当、私？見る目あるじゃん。たぶん。", "わざわざ私にするんだ。ふふ、じゃあ退屈させないでね。"],
+  11: ["今日は私？了解。じゃ、さっさと片付けよ。", "私を選んだんだ。まあ、悪くない選択じゃない？", "担当ね。ちゃんとやるなら付き合うよ。……最後までね。"]
+};
 
-  function to12HourEnd(h) {
-    const period = h < 12 ? "AM" : "PM";
-    const displayHour = h % 12 === 0 ? 12 : h % 12;
-    return displayHour + ":59 " + period;
-  }
-
-  return to12Hour(startHour) + " — " + to12HourEnd(endHour);
+function getOperatorSwitchVoice(operator) {
+  const id = getOperatorId(operator);
+  return randomMessage(operatorSwitchVoices[id] || ["担当変更。今日もよろしく。"], `${operator.name}-switch`);
 }
 
 function getTimePeriod() {
@@ -1106,9 +1125,7 @@ function setOperatorVisual(imageState, message) {
   const current = getCurrentOperator();
   operatorName.textContent = current.name;
   operatorShift.textContent = getShiftText();
-  const unlocked = getUnlockedOperators();
-  const nextIndex = (getOperatorIndex() + 1) % unlocked.length;
-  nextOperator.textContent = `NEXT // ${unlocked[nextIndex].name}`;
+  nextOperator.textContent = "TAP IMAGE // TALK";
   operatorImage.src = current.images[imageState] || current.images.normal;
   operatorMessage.textContent = message;
 }
@@ -1461,6 +1478,7 @@ function renderNextReward(level) {
 
 function updatePlayer() {
   const level = getLevelFromScore(score);
+  ensureSelectedOperatorUnlocked();
   scoreText.textContent = score;
   levelText.textContent = level;
   hpText.textContent = hp;
@@ -1945,6 +1963,101 @@ function addQuestFromMobileSheet() {
 }
 
 // ===================================
+// OPERATOR SELECTOR UI
+// ===================================
+
+function renderOperatorSelector() {
+  if (!operatorSelectorGrid) return;
+
+  const level = getLevelFromScore(score);
+  ensureSelectedOperatorUnlocked();
+  operatorSelectorGrid.innerHTML = "";
+
+  operators.forEach((operator, index) => {
+    const id = index + 1;
+    const unlocked = operator.unlockLevel <= level;
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "operator-select-card";
+    if (!unlocked) card.classList.add("locked");
+    if (id === selectedOperatorId) card.classList.add("current");
+    card.disabled = !unlocked;
+
+    const imageWrap = document.createElement("div");
+    imageWrap.className = "operator-select-image-wrap";
+
+    const img = document.createElement("img");
+    img.src = operator.images.normal;
+    img.alt = operator.name;
+    imageWrap.appendChild(img);
+
+    if (!unlocked) {
+      const lock = document.createElement("div");
+      lock.className = "operator-select-lock";
+      lock.textContent = `LOCKED // LV.${operator.unlockLevel}`;
+      imageWrap.appendChild(lock);
+    }
+
+    const info = document.createElement("div");
+    info.className = "operator-select-info";
+    const name = document.createElement("strong");
+    name.textContent = operator.name;
+    const status = document.createElement("span");
+    status.textContent = unlocked ? (id === selectedOperatorId ? "CURRENT OPERATOR" : "SELECT") : `UNLOCK LEVEL ${operator.unlockLevel}`;
+    info.append(name, status);
+    card.append(imageWrap, info);
+
+    if (unlocked) {
+      card.addEventListener("click", () => selectOperator(id));
+    }
+
+    operatorSelectorGrid.appendChild(card);
+  });
+}
+
+function openOperatorSelector() {
+  if (!operatorSelector) return;
+  renderOperatorSelector();
+  operatorSelector.classList.add("open");
+  operatorSelector.setAttribute("aria-hidden", "false");
+  document.body.classList.add("operator-selector-open");
+}
+
+function closeOperatorSelector() {
+  if (!operatorSelector) return;
+  operatorSelector.classList.remove("open");
+  operatorSelector.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("operator-selector-open");
+}
+
+function selectOperator(id) {
+  const operator = operators[id - 1];
+  if (!operator) return;
+
+  const level = getLevelFromScore(score);
+  if (operator.unlockLevel > level) return;
+
+  selectedOperatorId = id;
+  localStorage.setItem(selectedOperatorKey, String(id));
+  closeOperatorSelector();
+
+  temporaryOperatorState("custom", 7000, {
+    image: "casual",
+    message: getOperatorSwitchVoice(operator)
+  });
+}
+
+if (changeOperatorButton) changeOperatorButton.addEventListener("click", openOperatorSelector);
+if (operatorSelectorClose) operatorSelectorClose.addEventListener("click", closeOperatorSelector);
+if (operatorSelectorBackdrop) operatorSelectorBackdrop.addEventListener("click", closeOperatorSelector);
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && operatorSelector?.classList.contains("open")) {
+    closeOperatorSelector();
+  }
+});
+
+// ===================================
 // EVENTS
 // ===================================
 
@@ -1994,6 +2107,7 @@ resetLevelButton.addEventListener("click", () => {
   score = 0;
   selectedTheme = "cyan";
   updatePlayer();
+  showOperator("idle");
   alert("LEVEL 1 にリセットしました！");
 });
 
@@ -2111,17 +2225,10 @@ if (lastVisitDate && daysBetween(lastVisitDate, getToday()) >= 3) {
 
 localStorage.setItem("lastVisitDate", getToday());
 
-let lastOperatorIndex = getOperatorIndex();
 let lastKnownDate = getToday();
 
 setInterval(() => {
-  const newOperatorIndex = getOperatorIndex();
   const newDate = getToday();
-
-  if (newOperatorIndex !== lastOperatorIndex) {
-    lastOperatorIndex = newOperatorIndex;
-    showOperator("idle");
-  }
 
   if (newDate !== lastKnownDate) {
     lastKnownDate = newDate;

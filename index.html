@@ -24,7 +24,24 @@
         <strong id="operatorName">OPERATOR 01</strong>
         <span id="operatorShift"></span>
         <span id="nextOperator"></span>
+        <button id="changeOperatorButton" class="operator-change-button" type="button">CHANGE</button>
       </div>
+    </div>
+  </div>
+
+  <!-- OPERATOR SELECTOR -->
+  <div id="operatorSelector" class="operator-selector" aria-hidden="true">
+    <div id="operatorSelectorBackdrop" class="operator-selector-backdrop"></div>
+    <div class="operator-selector-panel" role="dialog" aria-modal="true" aria-labelledby="operatorSelectorTitle">
+      <div class="operator-selector-head">
+        <div>
+          <span class="operator-selector-kicker">TACTICAL PERSONNEL</span>
+          <h2 id="operatorSelectorTitle">SELECT OPERATOR</h2>
+          <p>解放済みのオペレーターから、いつでも担当を変更できます。</p>
+        </div>
+        <button id="operatorSelectorClose" class="operator-selector-close" type="button" aria-label="閉じる">×</button>
+      </div>
+      <div id="operatorSelectorGrid" class="operator-selector-grid"></div>
     </div>
   </div>
 
