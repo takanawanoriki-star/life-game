@@ -800,7 +800,12 @@ function getVoice(operator, category, payload = {}) {
     half: "success",
     almost: "success",
     comeback: "daily",
-    lateNightStreak: "streak"
+    lateNightStreak: "streak",
+    abandon: "fail",
+    autoFail: "fail",
+    recovery: "success",
+    perfect: "success",
+    comebackBonus: "success"
   };
 
   const generated = combineVoiceParts(profile, categoryMap[category] || "talk", values);
@@ -924,6 +929,10 @@ const mobileQuestName = document.getElementById("mobileQuestName");
 const mobileQuestXp = document.getElementById("mobileQuestXp");
 const mobileQuestAddButton = document.getElementById("mobileQuestAddButton");
 const mobilePlayerDetailsButton = document.getElementById("mobilePlayerDetailsButton");
+const weeklyClearRateText = document.getElementById("weeklyClearRate");
+const weeklyFailCountText = document.getElementById("weeklyFailCount");
+const weeklyPerfectDaysText = document.getElementById("weeklyPerfectDays");
+const activeRecoveryCountText = document.getElementById("activeRecoveryCount");
 
 let mobileSelectedDate = getToday();
 
@@ -963,6 +972,17 @@ function daysBetween(a, b) {
   return Math.round((end - start) / 86400000);
 }
 
+function addDaysToDateString(dateString, amount) {
+  const date = createDateFromString(dateString);
+  date.setDate(date.getDate() + amount);
+  return formatDate(date);
+}
+
+function makeQuestId() {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return `q-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 // ===================================
 // DATA SAVE / MIGRATION
 // ===================================
@@ -985,8 +1005,224 @@ quests.forEach(quest => {
     quest.failed = false;
     migrated = true;
   }
+  if (!quest.id) {
+    quest.id = makeQuestId();
+    migrated = true;
+  }
+  if (typeof quest.isRecovery !== "boolean") {
+    quest.isRecovery = false;
+    migrated = true;
+  }
 });
 if (migrated) saveQuests();
+
+// ===================================
+// ACCOUNTABILITY / RECOVERY SYSTEM V8
+// ===================================
+
+const missionOutcomeLogKey = "missionOutcomeLogV1";
+const comebackBonusDatesKey = "comebackBonusDatesV1";
+const perfectCelebratedDatesKey = "perfectCelebratedDatesV1";
+let missionOutcomeLog = {};
+let comebackBonusDates = {};
+let perfectCelebratedDates = {};
+
+try { missionOutcomeLog = JSON.parse(localStorage.getItem(missionOutcomeLogKey) || "{}") || {}; } catch (_) {}
+try { comebackBonusDates = JSON.parse(localStorage.getItem(comebackBonusDatesKey) || "{}") || {}; } catch (_) {}
+try { perfectCelebratedDates = JSON.parse(localStorage.getItem(perfectCelebratedDatesKey) || "{}") || {}; } catch (_) {}
+
+function saveMissionOutcomeLog() {
+  localStorage.setItem(missionOutcomeLogKey, JSON.stringify(missionOutcomeLog));
+}
+
+function recordQuestOutcome(quest, outcome, extra = {}) {
+  if (!quest?.id) return;
+  missionOutcomeLog[quest.id] = {
+    id: quest.id,
+    date: quest.date,
+    name: quest.name,
+    xp: Number(quest.xp) || 0,
+    outcome,
+    isRecovery: Boolean(quest.isRecovery),
+    ...extra
+  };
+  saveMissionOutcomeLog();
+}
+
+function recordAbandon(quest) {
+  if (!quest?.id) return;
+  const key = `abandon-${quest.id}-${quest.date}`;
+  missionOutcomeLog[key] = {
+    id: key,
+    questId: quest.id,
+    date: quest.date,
+    name: quest.name,
+    xp: Number(quest.xp) || 0,
+    outcome: "abandoned",
+    isRecovery: Boolean(quest.isRecovery)
+  };
+  saveMissionOutcomeLog();
+}
+
+function syncOutcomeLogFromQuests() {
+  quests.forEach(quest => {
+    if (quest.completed) recordQuestOutcome(quest, "completed");
+    else if (quest.failed) recordQuestOutcome(quest, "failed", { auto: Boolean(quest.autoFailed) });
+  });
+}
+
+function createRecoveryQuest(sourceQuest) {
+  if (!sourceQuest || sourceQuest.isRecovery || sourceQuest.recoveryCreated) return null;
+  if (quests.some(q => q.sourceQuestId === sourceQuest.id)) {
+    sourceQuest.recoveryCreated = true;
+    return null;
+  }
+
+  const today = getToday();
+  const targetDate = sourceQuest.date < today ? today : addDaysToDateString(sourceQuest.date, 1);
+  const cleanName = sourceQuest.name.replace(/^RECOVERY\s*\/\/\s*/i, "");
+  const recovery = {
+    id: makeQuestId(),
+    name: `RECOVERY // ${cleanName}`,
+    xp: (Number(sourceQuest.xp) || 0) + 30,
+    date: targetDate,
+    completed: false,
+    failed: false,
+    isRecovery: true,
+    sourceQuestId: sourceQuest.id,
+    recoveryBonus: 30
+  };
+  sourceQuest.recoveryCreated = true;
+  quests.push(recovery);
+  return recovery;
+}
+
+function markQuestFailed(quest, { auto = false, hpPenalty = false } = {}) {
+  if (!quest || quest.completed || quest.failed) return false;
+  quest.failed = true;
+  quest.autoFailed = auto;
+  questClearStreak = 0;
+  localStorage.setItem("questClearStreakV2", "0");
+  if (hpPenalty) hp = Math.max(0, hp - 10);
+  recordQuestOutcome(quest, "failed", { auto });
+  createRecoveryQuest(quest);
+  return true;
+}
+
+function processOverdueQuests() {
+  const today = getToday();
+  let count = 0;
+  quests.forEach(quest => {
+    if (quest.date < today && !quest.completed && !quest.failed) {
+      if (markQuestFailed(quest, { auto: true, hpPenalty: false })) count += 1;
+    }
+  });
+  if (count > 0) saveQuests();
+  return count;
+}
+
+function getDayPerformance(dateString) {
+  syncOutcomeLogFromQuests();
+  const events = Object.values(missionOutcomeLog).filter(item => item.date === dateString);
+  const completed = events.filter(item => item.outcome === "completed").length;
+  const failed = events.filter(item => item.outcome === "failed").length;
+  const abandoned = events.filter(item => item.outcome === "abandoned").length;
+  const unresolved = quests.filter(q => q.date === dateString && !q.completed && !q.failed).length;
+  const totalResolved = completed + failed + abandoned;
+  return {
+    completed,
+    failed,
+    abandoned,
+    failures: failed + abandoned,
+    unresolved,
+    totalResolved,
+    perfect: completed > 0 && failed === 0 && abandoned === 0 && unresolved === 0
+  };
+}
+
+function awardComebackBonusIfEligible() {
+  const today = getToday();
+  if (comebackBonusDates[today]) return false;
+  const yesterday = addDaysToDateString(today, -1);
+  const yesterdayPerformance = getDayPerformance(yesterday);
+  const todayPerformance = getDayPerformance(today);
+  if (yesterdayPerformance.failures > 0 && todayPerformance.perfect) {
+    score += 50;
+    comebackBonusDates[today] = true;
+    localStorage.setItem(comebackBonusDatesKey, JSON.stringify(comebackBonusDates));
+    return true;
+  }
+  return false;
+}
+
+function markPerfectDayCelebratedIfNew() {
+  const today = getToday();
+  const performance = getDayPerformance(today);
+  if (!performance.perfect || perfectCelebratedDates[today]) return false;
+  perfectCelebratedDates[today] = true;
+  localStorage.setItem(perfectCelebratedDatesKey, JSON.stringify(perfectCelebratedDates));
+  return true;
+}
+
+function updateMissionPerformance() {
+  if (!weeklyClearRateText) return;
+  syncOutcomeLogFromQuests();
+  const monday = getMonday(new Date());
+  const weekDates = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i);
+    return formatDate(d);
+  });
+  const events = Object.values(missionOutcomeLog).filter(item => weekDates.includes(item.date));
+  const clears = events.filter(item => item.outcome === "completed").length;
+  const fails = events.filter(item => item.outcome === "failed" || item.outcome === "abandoned").length;
+  const resolved = clears + fails;
+  const rate = resolved === 0 ? 0 : Math.round((clears / resolved) * 100);
+  const perfectDays = weekDates.filter(date => date <= getToday() && getDayPerformance(date).perfect).length;
+  const recoveryCount = quests.filter(q => q.isRecovery && !q.completed && !q.failed && q.date >= getToday()).length;
+
+  weeklyClearRateText.textContent = `${rate}%`;
+  weeklyFailCountText.textContent = String(fails);
+  weeklyPerfectDaysText.textContent = String(perfectDays);
+  activeRecoveryCountText.textContent = String(recoveryCount);
+}
+
+function deleteQuestWithRules(quest) {
+  if (!quest) return false;
+  const today = getToday();
+  const isToday = quest.date === today;
+  const penalty = isToday ? 50 : 0;
+  const message = isToday
+    ? `「${quest.name}」を放棄しますか？\n\n当日のタスク削除は -50 XP です。`
+    : `「${quest.name}」を削除しますか？`;
+  if (!confirm(message)) return false;
+
+  if (isToday) {
+    score = Math.max(0, score - penalty);
+    if (!quest.completed && !quest.failed) recordAbandon(quest);
+  }
+
+  const index = quests.indexOf(quest);
+  if (index !== -1) quests.splice(index, 1);
+  saveQuests();
+  syncDailyCompletionLog();
+  updatePlayer();
+  updateMissionPerformance();
+  showTodayQuests();
+  showWeekPlan();
+  showMobileWeekPlan();
+
+  if (isToday) {
+    const current = getCurrentOperator();
+    temporaryOperatorState("custom", 7200, {
+      image: "serious",
+      message: `${getVoice(current, "abandon")} 今日のタスクを削除したので 50 XP 減少。`
+    });
+    showAchievement("QUEST ABANDONED", "-50 XP", "今日のタスクを削除しました");
+  } else {
+    showOperator("idle");
+  }
+  return true;
+}
 
 // ===================================
 // STREAK SYSTEM
@@ -997,10 +1233,18 @@ let dailyCompletionLog = JSON.parse(localStorage.getItem(dailyCompletionLogKey) 
 
 function syncDailyCompletionLog() {
   const today = getToday();
-  const dates = [...new Set(quests.filter(q => q.date <= today).map(q => q.date))];
+  const dates = [...new Set([
+    ...quests.filter(q => q.date <= today).map(q => q.date),
+    ...Object.values(missionOutcomeLog).filter(item => item.date <= today).map(item => item.date)
+  ])];
 
   dates.forEach(date => {
     const dayQuests = quests.filter(q => q.date === date);
+    const hasAbandon = Object.values(missionOutcomeLog).some(item => item.date === date && item.outcome === "abandoned");
+    if (hasAbandon) {
+      dailyCompletionLog[date] = "failed";
+      return;
+    }
     if (dayQuests.length === 0) {
       delete dailyCompletionLog[date];
       return;
@@ -1021,7 +1265,9 @@ function syncDailyCompletionLog() {
   });
 
   Object.keys(dailyCompletionLog).forEach(date => {
-    if (!quests.some(q => q.date === date)) delete dailyCompletionLog[date];
+    const hasQuest = quests.some(q => q.date === date);
+    const hasOutcome = Object.values(missionOutcomeLog).some(item => item.date === date);
+    if (!hasQuest && !hasOutcome) delete dailyCompletionLog[date];
   });
 
   localStorage.setItem(dailyCompletionLogKey, JSON.stringify(dailyCompletionLog));
@@ -1537,6 +1783,7 @@ function updatePlayer() {
   renderThemeSelect(level);
   renderRewardBadges(level);
   renderNextReward(level);
+  updateMissionPerformance();
 }
 
 // ===================================
@@ -1598,6 +1845,7 @@ function showTodayQuests() {
 
       score += quest.xp;
       quest.completed = true;
+      recordQuestOutcome(quest, "completed");
       questClearStreak += 1;
       localStorage.setItem("questClearStreakV2", String(questClearStreak));
 
@@ -1618,6 +1866,14 @@ function showTodayQuests() {
       const finishedToday = areTodayQuestsComplete();
       const newBest = bestDailyStreak > bestBefore;
       const fullEvents = [];
+      let comebackAwarded = false;
+      let perfectDayNew = false;
+
+      if (finishedToday) {
+        perfectDayNew = markPerfectDayCelebratedIfNew();
+        comebackAwarded = awardComebackBonusIfEligible();
+        if (comebackAwarded) updatePlayer();
+      }
 
       if (newLevel > oldLevel) {
         playLevelUpEffect();
@@ -1655,6 +1911,23 @@ function showTodayQuests() {
         }
       }
 
+      if (perfectDayNew) {
+        showAchievement("PERFECT DAY", "ALL MISSIONS CLEAR", "失敗・放棄なしで本日のタスクを完了");
+      }
+
+      if (comebackAwarded) {
+        const current = getCurrentOperator();
+        showAchievement("COMEBACK BONUS", "+50 XP", "昨日の失敗から立て直しました");
+        temporaryOperatorState("custom", 7600, {
+          image: "happy",
+          message: `${getVoice(current, "comebackBonus")} 昨日の分、ちゃんと取り返したね。+50 XP。`
+        });
+      }
+
+      if (quest.isRecovery) {
+        showAchievement("RECOVERY COMPLETE", `+${quest.xp} XP`, "失敗したクエストを取り返しました");
+      }
+
       if (fullEvents.length > 0) {
         queueFullScreenEvents(fullEvents);
       } else if (finishedToday) {
@@ -1668,29 +1941,22 @@ function showTodayQuests() {
 
     failButton.addEventListener("click", () => {
       if (quest.completed || quest.failed) return;
-      hp = Math.max(0, hp - 10);
-      quest.failed = true;
-      questClearStreak = 0;
-      localStorage.setItem("questClearStreakV2", "0");
+      markQuestFailed(quest, { auto: false, hpPenalty: true });
       saveQuests();
       syncDailyCompletionLog();
       updatePlayer();
       showTodayQuests();
       showWeekPlan();
       showMobileWeekPlan();
-      temporaryOperatorState("fail");
+      const current = getCurrentOperator();
+      temporaryOperatorState("custom", 7600, {
+        image: "serious",
+        message: `${getVoice(current, "fail")} 明日にRECOVERY QUESTを追加したよ。次で取り返そう。`
+      });
     });
 
     deleteButton.addEventListener("click", () => {
-      if (!confirm(`「${quest.name}」を削除しますか？`)) return;
-      quests.splice(realIndex, 1);
-      saveQuests();
-      syncDailyCompletionLog();
-      updatePlayer();
-      showTodayQuests();
-      showWeekPlan();
-      showMobileWeekPlan();
-      showOperator("idle");
+      deleteQuestWithRules(quest);
     });
 
     questBox.append(name, clearButton, failButton, deleteButton);
@@ -1782,15 +2048,7 @@ function showWeekPlan() {
       deleteButton.className = "week-delete-button";
       deleteButton.addEventListener("click", event => {
         event.stopPropagation();
-        if (!confirm(`「${quest.name}」を削除しますか？`)) return;
-        const index = quests.indexOf(quest);
-        if (index !== -1) quests.splice(index, 1);
-        saveQuests();
-        updatePlayer();
-        showTodayQuests();
-        showWeekPlan();
-      showMobileWeekPlan();
-        showOperator("idle");
+        deleteQuestWithRules(quest);
       });
       box.appendChild(deleteButton);
       dayColumn.appendChild(box);
@@ -1947,17 +2205,7 @@ function renderMobileQuestSheet() {
     del.className = "delete-button";
     del.textContent = "削除";
     del.addEventListener("click", () => {
-      if (!confirm(`「${quest.name}」を削除しますか？`)) return;
-      const index = quests.indexOf(quest);
-      if (index !== -1) quests.splice(index, 1);
-      saveQuests();
-      syncDailyCompletionLog();
-      updatePlayer();
-      showTodayQuests();
-      showWeekPlan();
-      showMobileWeekPlan();
-      renderMobileQuestSheet();
-      showOperator("idle");
+      if (deleteQuestWithRules(quest)) renderMobileQuestSheet();
     });
 
     actions.appendChild(del);
@@ -2132,7 +2380,7 @@ addQuestButton.addEventListener("click", () => {
     return;
   }
 
-  quests.push({ name: questName, xp: questXp, date: questDate, completed: false, failed: false });
+  quests.push({ id: makeQuestId(), name: questName, xp: questXp, date: questDate, completed: false, failed: false, isRecovery: false });
   saveQuests();
   syncDailyCompletionLog();
   updatePlayer();
@@ -2245,6 +2493,8 @@ window.addEventListener("resize", () => {
 
 todayText.textContent = displayDate(getToday());
 questDateInput.value = getToday();
+const overdueAutoFailedOnStart = processOverdueQuests();
+syncOutcomeLogFromQuests();
 syncDailyCompletionLog();
 updatePlayer();
 showTodayQuests();
@@ -2268,6 +2518,17 @@ if (lastVisitDate && daysBetween(lastVisitDate, getToday()) >= 3) {
 
 localStorage.setItem("lastVisitDate", getToday());
 
+if (overdueAutoFailedOnStart > 0) {
+  setTimeout(() => {
+    const current = getCurrentOperator();
+    showAchievement("AUTO FAILED", `${overdueAutoFailedOnStart} MISSION${overdueAutoFailedOnStart === 1 ? "" : "S"}`, "未処理だった過去のタスクを失敗として記録しました");
+    temporaryOperatorState("custom", 8200, {
+      image: "serious",
+      message: `${getVoice(current, "autoFail")} 未処理だった${overdueAutoFailedOnStart}件はFAILED。RECOVERYで取り返そう。`
+    });
+  }, 500);
+}
+
 let lastKnownDate = getToday();
 
 setInterval(() => {
@@ -2277,14 +2538,25 @@ setInterval(() => {
     lastKnownDate = newDate;
     questClearStreak = 0;
     localStorage.setItem("questClearStreakV2", "0");
+    const autoFailedCount = processOverdueQuests();
+    syncOutcomeLogFromQuests();
     syncDailyCompletionLog();
     todayText.textContent = displayDate(newDate);
     questDateInput.value = newDate;
     updatePlayer();
     showTodayQuests();
     showWeekPlan();
-  showMobileWeekPlan();
-    showOperator("daily");
+    showMobileWeekPlan();
+    if (autoFailedCount > 0) {
+      const current = getCurrentOperator();
+      showAchievement("AUTO FAILED", `${autoFailedCount} MISSION${autoFailedCount === 1 ? "" : "S"}`, "未処理の前日タスクを失敗として記録");
+      temporaryOperatorState("custom", 8200, {
+        image: "serious",
+        message: `${getVoice(current, "autoFail")} 昨日の未処理タスクはFAILED。今日のRECOVERYで取り返そう。`
+      });
+    } else {
+      showOperator("daily");
+    }
     localStorage.setItem("lastGreetingDate", newDate);
     localStorage.setItem("lastVisitDate", newDate);
   }

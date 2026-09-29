@@ -2681,3 +2681,86 @@ body.operator-selector-open {
     padding: 5px 4px;
   }
 }
+
+
+/* =========================================
+   MISSION PERFORMANCE / ACCOUNTABILITY V8
+========================================= */
+.performance-section {
+  margin-bottom: 34px;
+  padding: 20px;
+  background: rgba(7, 22, 33, 0.9);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--trion);
+}
+.performance-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.performance-head h2 {
+  margin: 4px 0 0;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--trion-soft);
+}
+.performance-note {
+  color: var(--text-sub);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.performance-card {
+  padding: 13px 12px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid #20465d;
+}
+.performance-card span {
+  display: block;
+  color: var(--text-sub);
+  font-size: 9px;
+  letter-spacing: 1.3px;
+}
+.performance-card strong {
+  display: block;
+  margin-top: 6px;
+  color: #fff;
+  font-size: 20px;
+}
+.performance-rule {
+  margin: 12px 0 0;
+  color: #688a9d;
+  font-size: 10px;
+  line-height: 1.6;
+}
+@media (max-width: 750px) {
+  .performance-section {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .performance-head { margin-bottom: 8px; }
+  .performance-note,
+  .performance-rule { display: none; }
+  .performance-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+  .performance-card {
+    padding: 9px 5px;
+    text-align: center;
+  }
+  .performance-card span {
+    font-size: 6px;
+    letter-spacing: .5px;
+  }
+  .performance-card strong {
+    margin-top: 4px;
+    font-size: 14px;
+  }
+}

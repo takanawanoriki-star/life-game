@@ -113,6 +113,38 @@
     <button id="resetLevelButton" class="reset-button">LEVEL RESET</button>
   </section>
 
+  <!-- MISSION PERFORMANCE -->
+  <section class="performance-section">
+    <div class="performance-head">
+      <div>
+        <span class="progress-label">MISSION PERFORMANCE</span>
+        <h2>THIS WEEK</h2>
+      </div>
+      <span class="performance-note">失敗は次の行動に変える</span>
+    </div>
+
+    <div class="performance-grid">
+      <div class="performance-card">
+        <span>CLEAR RATE</span>
+        <strong id="weeklyClearRate">0%</strong>
+      </div>
+      <div class="performance-card">
+        <span>FAIL COUNT</span>
+        <strong id="weeklyFailCount">0</strong>
+      </div>
+      <div class="performance-card">
+        <span>PERFECT DAYS</span>
+        <strong id="weeklyPerfectDays">0</strong>
+      </div>
+      <div class="performance-card">
+        <span>RECOVERY</span>
+        <strong id="activeRecoveryCount">0</strong>
+      </div>
+    </div>
+
+    <p class="performance-rule">未処理の前日タスクは自動FAILED。当日の削除は −50 XP。失敗タスクは翌日にRECOVERYとして再挑戦できます。</p>
+  </section>
+
   <!-- MOBILE QUICK WEEKLY PLAN -->
   <section class="mobile-weekly-section" id="mobileWeeklySection">
     <div class="mobile-week-header">
