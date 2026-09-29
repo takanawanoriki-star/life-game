@@ -712,8 +712,8 @@ function getUnlockedOperators(level = getLevelFromScore(score)) {
 function getOperatorIndex() {
   const unlocked = getUnlockedOperators();
   const start = new Date(2026, 8, 27, 0, 0, 0);
-  const twelveHours = 12 * 60 * 60 * 1000;
-  const blocksPassed = Math.floor((Date.now() - start.getTime()) / twelveHours);
+  const fourHours = 4 * 60 * 60 * 1000;
+  const blocksPassed = Math.floor((Date.now() - start.getTime()) / fourHours);
   return ((blocksPassed % unlocked.length) + unlocked.length) % unlocked.length;
 }
 
@@ -723,7 +723,23 @@ function getCurrentOperator() {
 }
 
 function getShiftText() {
-  return new Date().getHours() < 12 ? "12:00 AM — 11:59 AM" : "12:00 PM — 11:59 PM";
+  const hour = new Date().getHours();
+  const startHour = Math.floor(hour / 4) * 4;
+  const endHour = startHour + 3;
+
+  function to12Hour(h) {
+    const period = h < 12 ? "AM" : "PM";
+    const displayHour = h % 12 === 0 ? 12 : h % 12;
+    return displayHour + ":00 " + period;
+  }
+
+  function to12HourEnd(h) {
+    const period = h < 12 ? "AM" : "PM";
+    const displayHour = h % 12 === 0 ? 12 : h % 12;
+    return displayHour + ":59 " + period;
+  }
+
+  return to12Hour(startHour) + " — " + to12HourEnd(endHour);
 }
 
 function getTimePeriod() {
